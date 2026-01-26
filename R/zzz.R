@@ -8,5 +8,6 @@ NULL
 
 # Register global variables used in NSE / ggplot aesthetics to avoid R CMD check notes
 if (getRversion() >= "2.15.1") utils::globalVariables(c(
-  ".data", "lon", "lat", "lonend", "latend", "group", "endheight", "alpha"
+  ".data", "lon", "lat", "long", "lonend", "latend", "group", "endheight",
+  "alpha", "istip", "label", "highlighted", "x", "y", "xend", "yend"
 ))

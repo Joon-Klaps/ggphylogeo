@@ -11,6 +11,7 @@
 #' @param height_hpd column name for HPD heights (default: "height_median")
 #' @param level HPD level (default: "0.80")
 #' @param digits numeric digits for rounding coordinates (default: 2)
+#' @param most_recent_sample Date or numeric year (e.g. 2019) used to calibrate endheight to actual dates. If NULL (default) no calibration is performed.
 #' @param debug logical debug messages
 #' @export
 build_phylogeo <- function(
@@ -21,56 +22,60 @@ build_phylogeo <- function(
   height_hpd = "height_median",
   level = "0.80",
   digits = 2,
+  most_recent_sample = NULL,
   debug = getOption("ggphylogeo.debug", FALSE)
 ) {
   check_treedata(treedata)
 
   if (debug) message("build_phylogeo: building branches and HPD polygons")
 
-  branches <- build_branches(treedata, lon = lon, lat = lat, height = height_branches, digits = digits, debug = debug)
-  hpd <- build_hpd(treedata, level = level, lon = lon, lat = lat, height = height_hpd, debug = debug)
+  ## ---- Build raw components (with calibration) ---------------------------
+  branches <- build_branches(
+    treedata,
+    lon = lon,
+    lat = lat,
+    height = height_branches,
+    digits = digits,
+    most_recent_sample = most_recent_sample,
+    debug = debug
+  )
 
-  # Build nodes table from branch segments (prefer end-coordinates when present)
-  t <- treedata@phylo
-  ntips <- length(t$tip.label)
+  hpd <- build_hpd(
+    treedata,
+    level = level,
+    lon = lon,
+    lat = lat,
+    height = height_hpd,
+    most_recent_sample = most_recent_sample,
+    debug = debug
+  )
 
-  if (nrow(branches) == 0) {
-    nodes <- data.frame(node = integer(0), lon = double(0), lat = double(0), endheight = double(0), istip = logical(0))
-  } else {
-    node_ids <- sort(unique(c(branches$startnode, branches$endnode)))
+  nodes <- build_nodes(
+      treedata,
+      lon = lon,
+      lat = lat,
+      height = height_hpd,
+      digits = digits,
+      most_recent_sample = most_recent_sample,
+      debug = debug
+  )
 
-    nodes_list <- lapply(node_ids, function(n) {
-      row_end <- branches[branches$endnode == n, , drop = FALSE]
-
-      if (nrow(row_end) > 0) {
-        lonval <- row_end$lonend[1]
-        latval <- row_end$latend[1]
-        h <- row_end$endheight[1]
-      } else {
-        row_start <- branches[branches$startnode == n, , drop = FALSE]
-        lonval <- row_start$lon[1]
-        latval <- row_start$lat[1]
-        h <- row_start$startheight[1]
-      }
-
-      data.frame(
-        node = n,
-        lon = round(as.numeric(lonval), digits),
-        lat = round(as.numeric(latval), digits),
-        endheight = as.numeric(h),
-        istip = n <= ntips,
-        stringsAsFactors = FALSE
-      )
-    })
-
-    nodes <- do.call(rbind, nodes_list)
+  ## ---- Final sanity check --------------------------------------------------
+  if (debug) {
+    message(sprintf(
+      "build_phylogeo: branches=%d rows; hpd=%d rows; nodes=%d rows",
+      nrow(branches),
+      ifelse(is.null(hpd), 0, nrow(hpd)),
+      nrow(nodes)
+    ))
   }
 
-  if (debug) message(sprintf("build_phylogeo: branches=%d rows; hpd=%d rows; nodes=%d rows",
-                           nrow(branches), ifelse(is.null(hpd), 0, nrow(hpd)), nrow(nodes)))
-
   structure(
-    list(branches = branches, hpd = hpd, nodes = nodes),
+    list(
+      branches = branches,
+      hpd = hpd,
+      nodes = nodes
+    ),
     class = "phylo_phylogeo"
   )
 }

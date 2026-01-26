@@ -11,7 +11,7 @@ geom_phylo_branches(mapping = NULL, data = NULL, ...)
 
 \item{data}{A data frame or \code{phylo_phylogeo} object containing branches.}
 
-\item{...}{Other arguments passed on to ggplot2::geom_segment.}
+\item{...}{Other arguments passed on to ggplot2::geom_curve.}
 }
 \description{
 Phylogeographic tree branches

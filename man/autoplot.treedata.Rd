@@ -19,40 +19,78 @@ autoplot.treedata(
   map_alpha = 0.5,
   map_pad = 1,
   map_name = "world",
+  most_recent_sample = NULL,
+  curvature = 0.3,
+  arrow = NULL,
+  show_direction_legend = FALSE,
+  highlight_tips = NULL,
+  highlight_color = "red",
+  tip_size = 2.5,
+  node_size = 2,
+  tip_stroke = 0.5,
+  date_format = "\%Y",
   ...
 )
 }
 \arguments{
 \item{object}{treedata object with phylogeographic annotations}
 
-\item{debug}{logical debug messages}
+\item{debug}{logical; emit debug messages}
 
-\item{show_map}{logical whether to overlay map (default: TRUE)}
+\item{show_map}{logical; overlay map background}
 
-\item{lat}{name of latitude column in treedata (default: "location1")}
+\item{lat}{name of latitude column}
 
-\item{lon}{name of longitude column in treedata (default: "location2")}
+\item{lon}{name of longitude column}
 
-\item{map_fill}{fill color for map polygons (default: "gray95")}
+\item{map_fill}{fill color for map polygons}
 
-\item{map_colour}{outline color for map polygons (default: "gray50")}
+\item{map_colour}{outline color for map polygons}
 
-\item{height_branches}{column name used for branch heights (default: "height_mean")}
+\item{height_branches}{column used for branch heights}
 
-\item{height_hpd}{column name used for HPD polygon heights (default: "height_median")}
+\item{height_hpd}{column used for HPD heights}
 
-\item{level}{character or numeric HPD level to use (default: "0.80")}
+\item{level}{HPD level (e.g., "0.80" for 80\% HPD)}
 
-\item{digits}{integer number of decimal digits for coordinate rounding (default: 2)}
+\item{digits}{decimal rounding for coordinates}
 
-\item{map_alpha}{transparency for map polygons (default: 0.5)}
+\item{map_alpha}{transparency for map polygons (0-1)}
 
-\item{map_pad}{numeric degrees to pad the map extent (default: 1)}
+\item{map_pad}{padding (degrees) for map extent}
 
-\item{map_name}{character name of map database (default: "world")}
+\item{map_name}{map database name (e.g., "world", "usa", "state")}
 
-\item{...}{additional arguments passed to specific geoms}
+\item{most_recent_sample}{date/year used to calibrate endheight to real
+dates. Can be Date, POSIXt, numeric year (e.g., 2019), or character
+"YYYY-MM-DD"}
+
+\item{curvature}{curvature of branch curves (default 0.3)}
+
+\item{arrow}{arrow specification for branches (see grid::arrow)}
+
+\item{show_direction_legend}{logical; show mini legend explaining branch
+direction (default FALSE)}
+
+\item{highlight_tips}{character vector of tip labels to highlight}
+
+\item{highlight_color}{color for highlighted tips (default "red")}
+
+\item{tip_size}{size of tip nodes (default 2.5)}
+
+\item{node_size}{size of internal nodes (default 2)}
+
+\item{tip_stroke}{stroke width for tip nodes (default 0.5)}
+
+\item{date_format}{format string for date labels (default "\\%Y")}
+
+\item{...}{passed to geoms}
+}
+\value{
+A ggplot2 object
 }
 \description{
-Autoplot continuous phylogeography
+Creates a ggplot2 visualization of continuous phylogeographic data from
+BEAST analyses. Supports various customization options including map
+backgrounds, tip highlighting, and direction legends.
 }

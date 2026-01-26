@@ -19,6 +19,34 @@ td <- read.beast("example.MCC.nexus")
 autoplot(td)
 ```
 
+## Shiny App
+
+```R
+library(ggphylogeo)
+library(treeio)
+
+# Load tree
+tree <- read.beast("path/to/beast.tree")
+
+# Basic plot with date scale
+p <- autoplot(tree,
+              most_recent_sample = "2019-06-15",
+              date_format = "%Y")
+
+# With highlighting and direction legend
+p <- autoplot(tree,
+              most_recent_sample = 2019,
+              highlight_tips = c("Sample_A", "Sample_B"),
+              highlight_color = "red",
+              show_direction_legend = TRUE)
+
+# Interactive Shiny app
+run_phylogeo_app(tree, most_recent_sample = "2019-06-15")
+
+# Quick plotly conversion
+ggplotly_phylogeo(p)
+```
+
 ## ✨ Contributing & Development
 
 Any contributions are welcome! Please fork the repository and

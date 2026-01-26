@@ -12,6 +12,7 @@ build_phylogeo(
   height_hpd = "height_median",
   level = "0.80",
   digits = 2,
+  most_recent_sample = NULL,
   debug = getOption("ggphylogeo.debug", FALSE)
 )
 }
@@ -29,6 +30,8 @@ build_phylogeo(
 \item{level}{HPD level (default: "0.80")}
 
 \item{digits}{numeric digits for rounding coordinates (default: 2)}
+
+\item{most_recent_sample}{Date or numeric year (e.g. 2019) used to calibrate endheight to actual dates. If NULL (default) no calibration is performed.}
 
 \item{debug}{logical debug messages}
 }

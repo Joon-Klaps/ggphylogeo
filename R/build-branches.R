@@ -1,11 +1,19 @@
 #' Build phylogeographic branch segments
 #'
+#' Constructs a data frame of branch segments for phylogeographic visualization.
+#' Each row represents a branch from parent to child node with geographic
+#' coordinates and temporal information.
+#'
 #' @param treedata treedata object with phylogeographic annotations
 #' @param lon name of longitude column (default: "location1")
 #' @param lat name of latitude column (default: "location2")
 #' @param height column name used for branch heights (default: "height_mean")
 #' @param digits number of decimal places for rounding coordinates (default: 2)
+#' @param most_recent_sample Date or numeric year (e.g. 2019) used to calibrate
+#'   endheight to actual dates. If NULL (default) no calibration is performed.
 #' @param debug logical debug messages
+#' @return A data.frame with columns: startnode, endnode, lon, lat, lonend,
+#'   latend, startheight, endheight, istip, label
 #' @export
 build_branches <- function(
   treedata,
@@ -13,67 +21,61 @@ build_branches <- function(
   lat = "location2",
   height = "height_mean",
   digits = 2,
+  most_recent_sample = NULL,
   debug = getOption("ggphylogeo.debug", FALSE)
 ) {
   check_treedata(treedata)
 
-  d <- treedata@data
-  t <- treedata@phylo
-  key <- match_nodes(t, d)
-  edges <- t$edge
-
-  # Helper for safe extraction: returns NA if value is NULL or empty
-  safe_get <- function(col_name, node_idx) {
-    # Get the row index from our key
-    row_idx <- key[node_idx]
-
-    # If node isn't in data or column doesn't exist
-    if (is.na(row_idx) || !col_name %in% names(d)) return(NA)
-
-    val <- d[[col_name]][[row_idx]]
-
-    # Handle NULLs or empty vectors which cause the "0 rows" error
-    if (is.null(val) || length(val) == 0) return(NA)
-
-    return(as.numeric(val))
+  if (debug) {
+    message(sprintf("build_branches: lon=%s lat=%s height=%s", lon, lat, height))
   }
 
-  if (debug) message(sprintf("build_branches: lon=%s lat=%s height=%s", lon, lat, height))
+  phy <- treedata@phylo
+  edges <- phy$edge
+  n_tips <- length(phy$tip.label)
+  n_total <- max(edges)
 
-  branch_list <- lapply(seq_len(nrow(edges)), function(j) {
-    n1 <- edges[j, 1] # Parent node
-    n2 <- edges[j, 2] # Child node
+  # Extract values for all nodes
+  lons <- get_node_vals(treedata, lon)
+  lats <- get_node_vals(treedata, lat)
+  heights <- get_node_vals(treedata, height)
 
-    # Extract values safely
-    lon_val    <- safe_get(lon, n1)
-    lat_val    <- safe_get(lat, n1)
-    lonend_val <- safe_get(lon, n2)
-    latend_val <- safe_get(lat, n2)
-    h_start  <- safe_get(height, n1)
-    h_end    <- safe_get(height, n2)
+  # Calibrate heights if most_recent_sample provided
+  if (!is.null(most_recent_sample)) {
+    heights <- calibrate_endheight(heights, most_recent_sample, debug = debug)
+  }
 
-    data.frame(
-      startnode   = n1,
-      endnode     = n2,
-      lon           = round(lon_val, digits),
-      lat           = round(lat_val, digits),
-      lonend        = round(lonend_val, digits),
-      latend        = round(latend_val, digits),
-      startheight = h_start,
-      endheight   = h_end,
-      stringsAsFactors = FALSE
-    )
-  })
+  # Build labels for all nodes
+  labels <- character(n_total)
+  labels[seq_len(n_tips)] <- phy$tip.label
+  labels[(n_tips + 1):n_total] <- paste0("Node ", (n_tips + 1):n_total)
 
-  branch <- do.call(rbind, branch_list)
+  parent <- edges[, 1]
+  child <- edges[, 2]
 
-  # Remove segments where we have no spatial data (e.g. root with no location)
-  # This prevents plotting 'ghost' lines from (NA, NA)
-  branch <- branch[!is.na(branch$lon) & !is.na(branch$lonend), ]
+  branch <- data.frame(
+    startnode   = parent,
+    endnode     = child,
+    lon         = round(lons[parent], digits),
+    lat         = round(lats[parent], digits),
+    lonend      = round(lons[child], digits),
+    latend      = round(lats[child], digits),
+    startheight = heights[parent],
+    endheight   = heights[child],
+    istip       = child <= n_tips,
+    label       = labels[child],
+    stringsAsFactors = FALSE
+  )
 
-  branch$istip <- branch$endnode <= length(t$tip.label)
+  # Remove invalid segments (missing coordinates)
+  valid <- !is.na(branch$lon) & !is.na(branch$lonend)
+  branch <- branch[valid, ]
 
-  if (debug) message(sprintf("build_branches: created %d segments", nrow(branch)))
+  if (debug) {
+    message(sprintf("build_branches: created %d segments (%d to tips, %d internal)",
+                    nrow(branch), sum(branch$istip), sum(!branch$istip)))
+  }
 
-  return(branch[order(-branch$endheight), ])
+  # Order by endheight (descending) for proper layering
+  branch[order(branch$endheight, decreasing = TRUE), ]
 }

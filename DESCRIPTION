@@ -1,24 +1,30 @@
 Package: ggphylogeo
 Type: Package
 Title: ggplot2 Tools for Continuous Phylogeography
-Version: 0.0.1
-Authors@R: person("Joon", "Klaps",email = "joon.klaps@example.com", role = c("aut", "cre"))
-Author: Joon Klaps [aut, cre]
-Maintainer: Joon Klaps <joon.klaps@example.com>
-Description: Visualisation tools for BEAST continuous phylogeographic
-    analyses using ggplot2.
-License: MIT
+Version: 0.1.0
+Authors@R: person("Joon", "Klaps", email = "joon.klaps@example.com", role = c("aut", "cre"))
+Description: Visualization tools for BEAST continuous phylogeographic
+    analyses using ggplot2. Provides functions to build and plot branch
+    segments, HPD polygons, and nodes from treedata objects. Includes
+    an interactive Shiny application for exploring phylogeographic data.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Imports:
-    ggplot2,
+    ggplot2 (>= 3.4.0),
     treeio,
     ape,
-    viridisLite
+    viridisLite,
+    grid
 Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
-    maps
+    maps,
+    shiny,
+    plotly,
+    colourpicker,
+    scales
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
+Config/testthat/edition: 3

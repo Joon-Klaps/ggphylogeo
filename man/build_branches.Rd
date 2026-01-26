@@ -10,6 +10,7 @@ build_branches(
   lat = "location2",
   height = "height_mean",
   digits = 2,
+  most_recent_sample = NULL,
   debug = getOption("ggphylogeo.debug", FALSE)
 )
 }
@@ -24,8 +25,17 @@ build_branches(
 
 \item{digits}{number of decimal places for rounding coordinates (default: 2)}
 
+\item{most_recent_sample}{Date or numeric year (e.g. 2019) used to calibrate
+endheight to actual dates. If NULL (default) no calibration is performed.}
+
 \item{debug}{logical debug messages}
 }
+\value{
+A data.frame with columns: startnode, endnode, lon, lat, lonend,
+latend, startheight, endheight, istip, label
+}
 \description{
-Build phylogeographic branch segments
+Constructs a data frame of branch segments for phylogeographic visualization.
+Each row represents a branch from parent to child node with geographic
+coordinates and temporal information.
 }

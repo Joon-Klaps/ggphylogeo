@@ -25,3 +25,38 @@ test_that("build_phylogeo returns a phylo_phylogeo object and geoms accept it", 
   expect_true(any(sapply(layers, function(l) inherits(l$geom, "GeomPolygon"))))
   expect_true(any(sapply(layers, function(l) inherits(l$geom, "GeomPoint"))))
 })
+
+
+test_that("endheight is converted to Date when most_recent_sample provided", {
+  skip_if_not_installed("treeio")
+
+  tree_file <- system.file("extdata", "WNV_cauchy.MCC.tree", package = "ggphylogeo")
+  td <- treeio::read.beast(tree_file)
+  mrs <- as.Date("2019-01-01")
+
+  segs <- build_branches(td, lon = "location2", lat = "location1", most_recent_sample = mrs)
+  expect_true(inherits(segs$endheight, "Date") || inherits(segs$endheight, "Date"))
+
+  polys <- build_hpd(td, level = "0.80", lon = "location1", lat = "location2", most_recent_sample = mrs)
+  expect_true(inherits(polys$endheight, "Date"))
+
+  pgeo <- build_phylogeo(td, lon = "location2", lat = "location1", most_recent_sample = mrs)
+  expect_true(inherits(pgeo$nodes$endheight, "Date"))
+})
+
+
+test_that("most_recent_sample accepts character 'YYYY-MM-DD'", {
+  skip_if_not_installed("treeio")
+  tree_file <- system.file("extdata", "WNV_cauchy.MCC.tree", package = "ggphylogeo")
+  td <- treeio::read.beast(tree_file)
+  mrs_str <- "2017-04-22"
+
+  segs <- build_branches(td, lon = "location2", lat = "location1", most_recent_sample = mrs_str)
+  expect_true(inherits(segs$endheight, "Date"))
+
+  polys <- build_hpd(td, level = "0.80", lon = "location1", lat = "location2", most_recent_sample = mrs_str)
+  expect_true(inherits(polys$endheight, "Date"))
+
+  pgeo <- build_phylogeo(td, lon = "location2", lat = "location1", most_recent_sample = mrs_str)
+  expect_true(inherits(pgeo$nodes$endheight, "Date"))
+})
