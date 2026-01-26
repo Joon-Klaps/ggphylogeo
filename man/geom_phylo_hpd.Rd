@@ -6,6 +6,13 @@
 \usage{
 geom_phylo_hpd(mapping = NULL, data = NULL, ...)
 }
+\arguments{
+\item{mapping}{Aesthetic mappings, created with ggplot2::aes().}
+
+\item{data}{A data frame or \code{phylo_phylogeo} object containing HPD polygons.}
+
+\item{...}{Other arguments passed on to ggplot2::geom_polygon.}
+}
 \description{
 Phylogeographic HPD polygons
 }

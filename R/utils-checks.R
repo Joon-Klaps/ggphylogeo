@@ -3,4 +3,3 @@ check_treedata <- function(x) {
     stop("Input must be a treedata object (from treeio::read.beast)", call. = FALSE)
   }
 }
-

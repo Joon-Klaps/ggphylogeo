@@ -1,0 +1,4 @@
+*.ipynb
+renv/
+..Rcheck/
+ggphylogeo_*.tar.gz

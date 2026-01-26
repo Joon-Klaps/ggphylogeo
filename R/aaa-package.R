@@ -2,7 +2,5 @@
 #'
 #' Visualisation tools for BEAST-style continuous phylogeographic analyses.
 #'
-#' @docType package
-#' @name ggphylogeo
-NULL
-
+#' @keywords internal
+"_PACKAGE"

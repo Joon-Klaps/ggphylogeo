@@ -4,7 +4,54 @@
 \alias{autoplot.treedata}
 \title{Autoplot continuous phylogeography}
 \usage{
-autoplot.treedata(object, ...)
+autoplot.treedata(
+  object,
+  debug = getOption("ggphylogeo.debug", FALSE),
+  show_map = TRUE,
+  lat = "location1",
+  lon = "location2",
+  map_fill = "gray95",
+  map_colour = "gray50",
+  height_branches = "height_mean",
+  height_hpd = "height_median",
+  level = "0.80",
+  digits = 2,
+  map_alpha = 0.5,
+  map_pad = 1,
+  map_name = "world",
+  ...
+)
+}
+\arguments{
+\item{object}{treedata object with phylogeographic annotations}
+
+\item{debug}{logical debug messages}
+
+\item{show_map}{logical whether to overlay map (default: TRUE)}
+
+\item{lat}{name of latitude column in treedata (default: "location1")}
+
+\item{lon}{name of longitude column in treedata (default: "location2")}
+
+\item{map_fill}{fill color for map polygons (default: "gray95")}
+
+\item{map_colour}{outline color for map polygons (default: "gray50")}
+
+\item{height_branches}{column name used for branch heights (default: "height_mean")}
+
+\item{height_hpd}{column name used for HPD polygon heights (default: "height_median")}
+
+\item{level}{character or numeric HPD level to use (default: "0.80")}
+
+\item{digits}{integer number of decimal digits for coordinate rounding (default: 2)}
+
+\item{map_alpha}{transparency for map polygons (default: 0.5)}
+
+\item{map_pad}{numeric degrees to pad the map extent (default: 1)}
+
+\item{map_name}{character name of map database (default: "world")}
+
+\item{...}{additional arguments passed to specific geoms}
 }
 \description{
 Autoplot continuous phylogeography
