@@ -1,0 +1,11 @@
+---
+title: "Continuous phylogeography with ggphylogeo"
+output: rmarkdown::html_vignette
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+This vignette demonstrates how to visualise BEAST continuous
+phylogeographic reconstructions using ggphylogeo.
