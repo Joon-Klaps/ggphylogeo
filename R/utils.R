@@ -51,33 +51,37 @@ get_data_bbox <- function(segs, hpd, pad = 1) {
   list(xlim = lonlim, ylim = latlim)
 }
 
-#' Create direction legend annotation
+#' Add direction legend annotation
 #'
 #' Builds a mini-legend showing the direction convention for curved branches.
 #' The legend displays two curved arrows demonstrating left-to-right and
 #' right-to-left directions.
 #'
-#' @param bbox list with xlim and ylim from get_data_bbox
+#' @param bbox list with xlim and ylim from [get_data_bbox()]
 #' @param curvature curvature value used in the main plot
-#' @return A list of ggplot2 annotation layers
-#' @noRd
+#' @return A list of ggplot2 annotation layers that can be added to a ggplot object
+#' @examples
+#' bbox <- list(xlim = c(-10, 10), ylim = c(-5, 5))
+#' p <- ggplot2::ggplot() + ggplot2::xlim(bbox$xlim) + ggplot2::ylim(bbox$ylim)
+#' p + add_direction_legend(bbox)
+#' @export
 add_direction_legend <- function(bbox, curvature = 0.3) {
-  # Position legend in bottom-right corner
+  # Position legend in top-left corner
   x_range <- diff(bbox$xlim)
   y_range <- diff(bbox$ylim)
 
-  # Legend box position (bottom-right)
-  legend_x <- bbox$xlim[2] - x_range * 0.15
-  legend_y <- bbox$ylim[1] + y_range * 0.12
+  # Legend box position (top-left)
+  legend_x <- bbox$xlim[1] + x_range * 0.15
+  legend_y <- bbox$ylim[2] - y_range * 0.12
   legend_width <- x_range * 0.12
   legend_height <- y_range * 0.08
 
   # Create legend data
   legend_df <- data.frame(
     x = c(legend_x - legend_width/2, legend_x + legend_width/2),
-    y = c(legend_y + legend_height/3, legend_y - legend_height/3),
+    y = c(legend_y - legend_height/4, legend_y - legend_height/8),
     xend = c(legend_x + legend_width/2, legend_x - legend_width/2),
-    yend = c(legend_y + legend_height/3, legend_y - legend_height/3),
+    yend = c(legend_y - legend_height/4, legend_y - legend_height/8),
     direction = c("Earlier \u2192 Later", "Later \u2192 Earlier")
   )
 
@@ -198,4 +202,48 @@ get_node_vals <- function(treedata, var_name) {
   vapply(raw_vals, function(x) {
     if (is.null(x) || length(x) == 0 || is.na(x[1])) NA_real_ else as.numeric(x[1])
   }, numeric(1))
+}
+
+#' Theme for ggphylogeo plots
+#'
+#' A ggplot2 theme tailored for phylogeographic plots.
+#'
+#' @return A ggplot2 theme object
+#' @examples
+#' ggplot2::ggplot() + theme_phylogeo()
+#' @export
+theme_phylogeo <- function() {
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      legend.position = c(.05, .05),
+      legend.justification = c("left", "bottom"),
+      legend.margin = ggplot2::margin(6, 6, 6, 6),
+      legend.background = ggplot2::element_rect(fill = "transparent", colour = NA),
+      legend.box.background = ggplot2::element_rect(fill = "transparent", colour = NA)
+    )
+}
+
+#' guides for ggphylogeo plots
+#'
+#' A ggplot2 guide tailored for phylogeographic plots.
+#'
+#' @return A ggplot2 guide object
+#' @examples
+#' ggplot2::ggplot() + guides_phylogeo()
+#' @export
+guides_phylogeo <- function() {
+  ggplot2::guides(
+    fill = ggplot2::guide_colourbar(
+      frame.colour = "black",
+      ticks.colour = "black",
+      theme = ggplot2::theme(
+        legend.key.width  = ggplot2::unit(0.5, "lines"),
+        legend.key.height = ggplot2::unit(10, "lines"),
+        legend.key = ggplot2::element_rect(fill = NA, colour = "black")
+      )
+    ),
+    # Throws an error
+    # size = ggplot2::element_blank(),
+    # alpha = ggplot2::element_blank()
+  )
 }

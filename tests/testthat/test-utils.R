@@ -131,7 +131,7 @@ test_that("add_direction_legend returns list of ggplot2 layers", {
   skip_if_not_installed("ggplot2")
 
   bbox <- list(xlim = c(-100, -80), ylim = c(25, 45))
-  legend <- add_direction_legend(bbox, curvature = 0.3)
+  legend <- add_direction_legend(bbox, curvature = 0.25)
 
   expect_type(legend, "list")
   expect_gt(length(legend), 0)

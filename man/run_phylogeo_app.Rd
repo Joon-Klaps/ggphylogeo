@@ -9,6 +9,7 @@ run_phylogeo_app(
   lon = "location2",
   lat = "location1",
   most_recent_sample = NULL,
+  stream = TRUE,
   height_branches = "height_mean",
   height_hpd = "height_median",
   level = "0.80",

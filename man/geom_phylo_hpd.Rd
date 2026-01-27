@@ -4,7 +4,7 @@
 \alias{geom_phylo_hpd}
 \title{Phylogeographic HPD polygons}
 \usage{
-geom_phylo_hpd(mapping = NULL, data = NULL, ...)
+geom_phylo_hpd(mapping = NULL, data = NULL, alpha = 0.5, ...)
 }
 \arguments{
 \item{mapping}{Aesthetic mappings, created with ggplot2::aes().}

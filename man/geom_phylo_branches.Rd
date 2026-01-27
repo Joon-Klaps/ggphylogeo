@@ -4,7 +4,7 @@
 \alias{geom_phylo_branches}
 \title{Phylogeographic tree branches}
 \usage{
-geom_phylo_branches(mapping = NULL, data = NULL, ...)
+geom_phylo_branches(mapping = NULL, data = NULL, stream = FALSE, ...)
 }
 \arguments{
 \item{mapping}{Aesthetic mappings, created with ggplot2::aes().}

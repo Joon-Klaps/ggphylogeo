@@ -20,15 +20,16 @@ autoplot.treedata(
   map_pad = 1,
   map_name = "world",
   most_recent_sample = NULL,
-  curvature = 0.3,
+  curvature = 0.25,
   arrow = NULL,
-  show_direction_legend = FALSE,
+  show_direction_legend = TRUE,
   highlight_tips = NULL,
   highlight_color = "red",
-  tip_size = 2.5,
-  node_size = 2,
-  tip_stroke = 0.5,
+  tip_size = 3.5,
+  node_size = 3,
+  tip_stroke = 1,
   date_format = "\%Y",
+  stream = FALSE,
   ...
 )
 }
@@ -76,11 +77,11 @@ direction (default FALSE)}
 
 \item{highlight_color}{color for highlighted tips (default "red")}
 
-\item{tip_size}{size of tip nodes (default 2.5)}
+\item{tip_size}{size of tip nodes (default 3.5)}
 
-\item{node_size}{size of internal nodes (default 2)}
+\item{node_size}{size of internal nodes (default 3)}
 
-\item{tip_stroke}{stroke width for tip nodes (default 0.5)}
+\item{tip_stroke}{stroke width for tip nodes (default 1)}
 
 \item{date_format}{format string for date labels (default "\\%Y")}
 

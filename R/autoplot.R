@@ -1,8 +1,9 @@
-#' Autoplot continuous phylogeography
+#' Autoplot continuous phylogeography with optional animation
 #'
 #' Creates a ggplot2 visualization of continuous phylogeographic data from
 #' BEAST analyses. Supports various customization options including map
-#' backgrounds, tip highlighting, and direction legends.
+#' backgrounds, tip highlighting, direction legends, and animated accumulation
+#' over time.
 #'
 #' @param object treedata object with phylogeographic annotations
 #' @param debug logical; emit debug messages
@@ -27,12 +28,21 @@
 #'   direction (default FALSE)
 #' @param highlight_tips character vector of tip labels to highlight
 #' @param highlight_color color for highlighted tips (default "red")
-#' @param tip_size size of tip nodes (default 2.5)
-#' @param node_size size of internal nodes (default 2)
-#' @param tip_stroke stroke width for tip nodes (default 0.5)
+#' @param tip_size size of tip nodes (default 3.5)
+#' @param node_size size of internal nodes (default 3)
+#' @param tip_stroke stroke width for tip nodes (default 1)
 #' @param date_format format string for date labels (default "\%Y")
+#' @param stream logical; use stream plotting (default FALSE)
+#' @param animate logical; create animated plot accumulating over time (default FALSE)
+#' @param nframes number of frames for animation (default 100)
+#' @param fps frames per second for animation (default 10)
+#' @param shadow_alpha alpha transparency for accumulated past data (default 0.3)
+#' @param shadow_size size multiplier for accumulated past data (default 0.8)
+#' @param shadow_colour colour for accumulated past data (default NULL, uses same as current)
+#' @param end_pause number of frames to pause at end of animation (default 20)
+#' @param renderer gganimate renderer function (default gifski_renderer())
 #' @param ... passed to geoms
-#' @return A ggplot2 object
+#' @return A ggplot2 object (if animate=FALSE) or gganim object (if animate=TRUE)
 #' @export
 autoplot.treedata <- function(
   object,
@@ -51,15 +61,26 @@ autoplot.treedata <- function(
   map_pad = 1,
   map_name = "world",
   most_recent_sample = NULL,
-  curvature = 0.3,
+  curvature = 0.25,
   arrow = NULL,
-  show_direction_legend = FALSE,
+  show_direction_legend = TRUE,
   highlight_tips = NULL,
   highlight_color = "red",
-  tip_size = 2.5,
-  node_size = 2,
-  tip_stroke = 0.5,
+  tip_size = 3.5,
+  node_size = 3,
+  tip_stroke = 1,
   date_format = "%Y",
+  stream = FALSE,
+
+  # Animation parameters
+  animate = FALSE,
+  nframes = 100,
+  fps = 10,
+  shadow_alpha = 0.3,
+  shadow_size = 0.8,
+  shadow_colour = NULL,
+  end_pause = 20,
+  renderer = NULL,
   ...
 ) {
 
@@ -81,6 +102,55 @@ autoplot.treedata <- function(
       "autoplot.treedata: branches=%d rows; hpd=%d rows; nodes=%d rows",
       nrow(pgeo$branches), nrow(pgeo$hpd), nrow(pgeo$nodes)
     ))
+  }
+
+  ## ---- Validate data for animation ----------------------------------------
+  if (isTRUE(animate)) {
+    # Check for NA values in endheight across all data
+    na_counts <- list(
+      nodes = if (!is.null(pgeo$nodes)) sum(is.na(pgeo$nodes$endheight)) else 0,
+      branches = if (!is.null(pgeo$branches)) sum(is.na(pgeo$branches$endheight)) else 0,
+      hpd = if (!is.null(pgeo$hpd)) sum(is.na(pgeo$hpd$endheight)) else 0
+    )
+
+    if (debug) {
+      message("Checking data validity for animation:")
+      message(sprintf("  NA values in nodes$endheight: %d", na_counts$nodes))
+      message(sprintf("  NA values in branches$endheight: %d", na_counts$branches))
+      message(sprintf("  NA values in hpd$endheight: %d", na_counts$hpd))
+    }
+
+    # Remove rows with NA endheight values
+    if (!is.null(pgeo$nodes) && na_counts$nodes > 0) {
+      if (debug) message("  Removing nodes with NA endheight")
+      pgeo$nodes <- pgeo$nodes[!is.na(pgeo$nodes$endheight), , drop = FALSE]
+    }
+
+    if (!is.null(pgeo$branches) && na_counts$branches > 0) {
+      if (debug) message("  Removing branches with NA endheight")
+      pgeo$branches <- pgeo$branches[!is.na(pgeo$branches$endheight), , drop = FALSE]
+    }
+
+    if (!is.null(pgeo$hpd) && na_counts$hpd > 0) {
+      if (debug) message("  Removing HPD regions with NA endheight")
+      pgeo$hpd <- pgeo$hpd[!is.na(pgeo$hpd$endheight), , drop = FALSE]
+    }
+
+    # Check if we have any data left
+    if (is.null(pgeo$nodes) || nrow(pgeo$nodes) == 0) {
+      stop("No valid nodes with non-NA endheight values for animation")
+    }
+
+    # Check time range
+    time_range <- range(pgeo$nodes$endheight, na.rm = TRUE)
+    if (debug) {
+      message(sprintf("  Time range: [%s, %s]",
+                     format(time_range[1]), format(time_range[2])))
+    }
+
+    if (time_range[1] == time_range[2]) {
+      warning("All endheight values are the same - animation will show single time point")
+    }
   }
 
   ## ---- Compute plotting extent ---------------------------------------------
@@ -139,6 +209,7 @@ autoplot.treedata <- function(
     if (any(moving)) {
       p <- p + geom_phylo_branches(
         data = branches[moving, , drop = FALSE],
+        stream = stream,
         curvature = curvature,
         arrow = arrow,
         ...
@@ -168,7 +239,7 @@ autoplot.treedata <- function(
         ggplot2::aes(x = lon, y = lat, fill = endheight),
         shape = 21,
         size = node_size,
-        stroke = 0,
+        stroke = tip_stroke/2,
         inherit.aes = FALSE
       )
     }
@@ -232,18 +303,89 @@ autoplot.treedata <- function(
     if (debug) message("Adding date scale for fill aesthetic")
     p <- p + ggplot2::scale_fill_viridis_c(
       name = "Date",
+      direction= -1,
       labels = function(x) format(as.Date(x, origin = "1970-01-01"), date_format)
     )
   } else {
     # Numeric scale - show as years if values suggest year-like data
-    p <- p + ggplot2::scale_fill_viridis_c(name = "Time")
+    p <- p + ggplot2::scale_fill_viridis_c( direction= -1, name = "Time")
   }
 
   ## ---- Theme ---------------------------------------------------------------
-  p +
-    ggplot2::theme_bw() +
+  p <- p +
     ggplot2::labs(
       x = "Longitude",
       y = "Latitude"
+    ) +
+    theme_phylogeo() +
+    guides_phylogeo()
+
+  ## ---- Animation -----------------------------------------------------------
+  if (isTRUE(animate)) {
+    if (!requireNamespace("gganimate", quietly = TRUE)) {
+      stop("Package 'gganimate' is required for animation. Install with install.packages('gganimate')")
+    }
+
+    if (debug) message("Adding animation with transition_reveal and shadow_mark")
+
+    # Build shadow_mark arguments
+    shadow_args <- list(
+      past = TRUE,
+      future = FALSE,
+      alpha = shadow_alpha,
+      size = shadow_size
     )
+
+    # Add colour if specified
+    if (!is.null(shadow_colour)) {
+      shadow_args$colour <- shadow_colour
+    }
+
+    # Add animation layers
+    if (is_date_scale) {
+      # For date scales, use the date directly
+      p <- p +
+        gganimate::transition_reveal(endheight) +
+        do.call(gganimate::shadow_mark, shadow_args) +
+        ggplot2::labs(
+          title = glue::glue("Date: {format(as.Date(frame_along, origin='1970-01-01'), date_format)}")
+        )
+    } else {
+      # For numeric scales
+      p <- p +
+        gganimate::transition_reveal(endheight) +
+        do.call(gganimate::shadow_mark, shadow_args) +
+        ggplot2::labs(
+          title = glue::glue("Time: {round(frame_along, 1)}")
+        )
+    }
+
+    # Set default renderer if not specified
+    if (is.null(renderer)) {
+      if (requireNamespace("gifski", quietly = TRUE)) {
+        renderer <- gganimate::gifski_renderer()
+      } else {
+        warning("Package 'gifski' not found. Using default renderer. Install with install.packages('gifski') for better performance.")
+        renderer <- gganimate::magick_renderer()
+      }
+    }
+
+    # Render the animation
+    if (debug) {
+      message(sprintf("Rendering animation with %d frames at %d fps", nframes, fps))
+    }
+
+    anim <- gganimate::animate(
+      p,
+      nframes = nframes,
+      fps = fps,
+      end_pause = end_pause,
+      renderer = renderer
+    )
+
+    return(anim)
+  }
+
+  # Return static plot if not animating
+  return(p)
 }

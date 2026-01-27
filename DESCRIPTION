@@ -23,6 +23,10 @@ Suggests:
     shiny,
     plotly,
     colourpicker,
+    gganimate,
+    glue,
+    gifski,
+    magick,
     scales
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
