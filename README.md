@@ -1,7 +1,9 @@
 # ggphylogeo
 
 <!-- badges: start -->
+
 [![R-CMD-check](https://github.com/Joon-Klaps/ggphylogeo/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Joon-Klaps/ggphylogeo/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
 ggplot2 extensions for visualising continuous phylogeographic
@@ -36,7 +38,7 @@ data(yfv_tree)
 autoplot(yfv_tree, most_recent_sample = "2017-04-22")
 ```
 
-![YFV phylogeography](inst/extdata/yfv.png)
+![YFV phylogeography](inst/extras/yfv.png)
 
 ## Detailed Plotting
 
@@ -80,7 +82,7 @@ ggplot() +
   guides_phylogeo()
 ```
 
-![WNV phylogeography](inst/extdata/wnv_animation.gif)
+![WNV phylogeography](inst/extras/wnv_animation.gif)
 
 ## Non-Geographic Data
 
@@ -108,7 +110,7 @@ ggplot() +
   labs(x = "Antigenic Dimension 1", y = "Antigenic Dimension 2")
 ```
 
-![H3N2 antigenic cartography](inst/extdata/h3n2.png)
+![H3N2 antigenic cartography](inst/extras/h3n2.png)
 
 ## Animation
 
@@ -170,6 +172,7 @@ run_phylogeo_app(wnv_tree, most_recent_sample = "2007-07-01")
 ```
 
 The Shiny app provides:
+
 - Toggle visibility of HPD polygons, branches, and nodes
 - Highlight specific tips
 - Adjust node sizes
@@ -179,12 +182,12 @@ The Shiny app provides:
 
 The package includes example BEAST MCC trees:
 
-| Dataset | Description | Use |
-|---------|-------------|-----|
-| `wnv_tree` | West Nile Virus, North America | Geographic phylogeography |
-| `yfv_tree` | Yellow Fever Virus, South America | Geographic phylogeography |
-| `hiv1_tree` | HIV-1 subtype G | Geographic phylogeography |
-| `h3n2_tree` | H3N2 Influenza | Antigenic cartography |
+| Dataset     | Description                       | Use                       |
+| ----------- | --------------------------------- | ------------------------- |
+| `wnv_tree`  | West Nile Virus, North America    | Geographic phylogeography |
+| `yfv_tree`  | Yellow Fever Virus, South America | Geographic phylogeography |
+| `hiv1_tree` | HIV-1 subtype G                   | Geographic phylogeography |
+| `h3n2_tree` | H3N2 Influenza                    | Antigenic cartography     |
 
 ```r
 # Load any bundled dataset
