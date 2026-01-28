@@ -3,6 +3,7 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/Joon-Klaps/ggphylogeo/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Joon-Klaps/ggphylogeo/actions/workflows/R-CMD-check.yaml)
+[![codecov](https://codecov.io/gh/Joon-Klaps/ggphylogeo/branch/main/graph/badge.svg)](https://codecov.io/gh/Joon-Klaps/ggphylogeo)
 
 <!-- badges: end -->
 
@@ -247,6 +248,8 @@ p <- ggplot() +
 anim <- gganimate::animate(p, nframes = 400, fps = 20)
 anim_save("wnv_animation_manual.gif", animation = anim)
 ```
+
+![WNV phylogeography animation](inst/extras/wnv_animation_manual.gif)
 
 ## Interactive Shiny App
 
