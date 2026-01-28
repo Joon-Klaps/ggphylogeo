@@ -79,6 +79,7 @@
 </h1></div>
 <!-- badges: start -->
 
+<!-- badges: end -->
 <p>ggplot2 extensions for visualising continuous phylogeographic reconstructions from BEAST.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -116,7 +117,7 @@
 <span><span class="co"># Basic plot with date calibration</span></span>
 <span><span class="fu">autoplot</span><span class="op">(</span><span class="va">yfv_tree</span>, most_recent_sample <span class="op">=</span> <span class="st">"2017-04-22"</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
-<img src="inst/extdata/yfv.png" alt="YFV phylogeography"><div class="figcaption">YFV phylogeography</div>
+<img src="inst/extras/yfv.png" alt="YFV phylogeography"><div class="figcaption">YFV phylogeography</div>
 </div>
 </div>
 <div class="section level2">
@@ -162,7 +163,7 @@
 <span>  <span class="fu"><a href="reference/theme_phylogeo.html">theme_phylogeo</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/guides_phylogeo.html">guides_phylogeo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
-<img src="inst/extdata/wnv_animation.gif" alt="WNV phylogeography"><div class="figcaption">WNV phylogeography</div>
+<img src="inst/extras/wnv_animation.gif" alt="WNV phylogeography"><div class="figcaption">WNV phylogeography</div>
 </div>
 </div>
 <div class="section level2">
@@ -189,7 +190,7 @@
 <span>  <span class="fu"><a href="reference/guides_phylogeo.html">guides_phylogeo</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Antigenic Dimension 1"</span>, y <span class="op">=</span> <span class="st">"Antigenic Dimension 2"</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
-<img src="inst/extdata/h3n2.png" alt="H3N2 antigenic cartography"><div class="figcaption">H3N2 antigenic cartography</div>
+<img src="inst/extras/h3n2.png" alt="H3N2 antigenic cartography"><div class="figcaption">H3N2 antigenic cartography</div>
 </div>
 </div>
 <div class="section level2">
@@ -245,7 +246,13 @@
 <span></span>
 <span><span class="co"># Launch interactive viewer</span></span>
 <span><span class="fu"><a href="reference/run_phylogeo_app.html">run_phylogeo_app</a></span><span class="op">(</span><span class="va">wnv_tree</span>, most_recent_sample <span class="op">=</span> <span class="st">"2007-07-01"</span><span class="op">)</span></span></code></pre></div>
-<p>The Shiny app provides: - Toggle visibility of HPD polygons, branches, and nodes - Highlight specific tips - Adjust node sizes - Interactive zooming and panning</p>
+<p>The Shiny app provides:</p>
+<ul>
+<li>Toggle visibility of HPD polygons, branches, and nodes</li>
+<li>Highlight specific tips</li>
+<li>Adjust node sizes</li>
+<li>Interactive zooming and panning</li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="bundled-datasets">Bundled Datasets<a class="anchor" aria-label="anchor" href="#bundled-datasets"></a>
@@ -253,9 +260,9 @@
 <p>The package includes example BEAST MCC trees:</p>
 <table class="table">
 <colgroup>
-<col width="33%">
-<col width="48%">
-<col width="18%">
+<col width="15%">
+<col width="47%">
+<col width="36%">
 </colgroup>
 <thead><tr class="header">
 <th>Dataset</th>
