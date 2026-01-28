@@ -10,11 +10,13 @@ Description: Visualization tools for BEAST continuous phylogeographic
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/Joon-Klaps/ggphylogeo
+BugReports: https://github.com/Joon-Klaps/ggphylogeo/issues
 Depends:
-    R (>= 3.5.0)
+    R (>= 4.0.0)
 Imports:
     ggplot2 (>= 3.4.0),
-    treeio,
+    treeio (>= 1.20.0),
     ape,
     viridisLite,
     grid,
@@ -35,8 +37,7 @@ Suggests:
     scales,
     rnaturalearthdata,
     rnaturalearth,
-    pak,
-    geojsonnio,
+    dplyr,
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

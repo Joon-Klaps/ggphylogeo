@@ -1,82 +1,105 @@
 #' Autoplot continuous phylogeography with optional animation
 #'
 #' Creates a ggplot2 visualization of continuous phylogeographic data from
-#' BEAST analyses. Supports various customization options including map
-#' backgrounds, tip highlighting, dispersion legends, and animated accumulation
-#' over time.
+#' BEAST analyses. For simple quick plots, this function provides sensible
+#' defaults. For custom visualizations, use `build_phylogeo()` with the
+#' individual geom functions (`geom_phylo_branches()`, `geom_phylo_hpd()`,
+#' `geom_phylo_nodes()`).
 #'
-#' @param object treedata object with phylogeographic annotations
-#' @param debug logical; emit debug messages
-#' @param show_map logical; overlay map background
-#' @param lat name of latitude column
-#' @param lon name of longitude column
-#' @param map_fill fill color for map polygons
-#' @param map_colour outline color for map polygons
-#' @param height_branches column used for branch ages
-#' @param height_hpd column used for HPD ages
-#' @param level HPD level (e.g., "0.80" for 80% HPD)
-#' @param digits decimal rounding for coordinates
-#' @param map_alpha transparency for map polygons (0-1)
-#' @param map_pad padding (degrees) for map extent
-#' @param map_name map database name (e.g., "world", "usa", "state")
-#' @param most_recent_sample date/year used to calibrate age to real
-#'   dates. Can be Date, POSIXt, numeric year (e.g., 2019), or character
-#'   "YYYY-MM-DD"
-#' @param curvature curvature of branch curves (default 0.3)
-#' @param arrow arrow specification for branches (see grid::arrow)
-#' @param show_dispersion_legend logical; show mini legend explaining branch
-#'   dispersion (default FALSE)
-#' @param highlight_tips character vector of tip labels to highlight
-#' @param highlight_color color for highlighted tips (default "red")
-#' @param tip_size size of tip nodes (default 3.5)
-#' @param node_size size of internal nodes (default 3)
-#' @param tip_stroke stroke width for tip nodes (default 1)
-#' @param date_format format string for date labels (default "%Y")
-#' @param stream logical; use stream plotting (default FALSE)
-#' @param animate logical; create animated plot accumulating over time (default FALSE)
-#' @param nframes number of frames for animation (default 100)
-#' @param fps frames per second for animation (default 10)
-#' @param shadow_alpha alpha transparency for accumulated past data (default 0.3)
-#' @param shadow_size size multiplier for accumulated past data (default 0.8)
-#' @param shadow_colour colour for accumulated past data (default NULL, uses same as current)
-#' @param end_pause number of frames to pause at end of animation (default 20)
-#' @param renderer gganimate renderer function (default gifski_renderer())
-#' @param ... passed to geoms
+#' @param object A treedata object with phylogeographic annotations from
+#'   `treeio::read.beast()`
+#' @param most_recent_sample Date, numeric year (e.g. 2019), or "YYYY-MM-DD"
+#'   string for calibrating ages to real dates. If NULL, ages remain as
+#'   numeric heights.
+#' @param lat Name of latitude coordinate column (default: "location1")
+#' @param lon Name of longitude coordinate column (default: "location2")
+#' @param show_map Logical; overlay world map background (default TRUE)
+#' @param show_dispersion_legend Logical; show legend explaining branch
+#'   curvature direction (default TRUE)
+#' @param smooth Logical; smooth HPD polygons for visual appeal (default TRUE)
+#' @param stream Logical; use stream-style branch plotting with fade effect
+#'   (default FALSE)
+#' @param curvature Curvature of branch curves (default -0.25). Positive values
+#'   curve left, negative curve right.
+#' @param highlight_tips Character vector of tip labels to highlight with
+#'   special styling
+#' @param highlight_color Color for highlighted tips (default "red")
+#' @param tip_size Size of tip nodes (default 3.5)
+#' @param node_size Size of internal nodes (default 3)
+#' @param date_format Format string for date axis labels (default "%Y")
+#' @param animate Logical; create animated plot showing temporal progression
+#'   (default FALSE). Requires gganimate and gifski packages.
+#' @param nframes Number of frames for animation (default 100)
+#' @param fps Frames per second for animation (default 10)
+#' @param end_pause Frames to pause at end of animation (default 20)
+#' @param renderer gganimate renderer function. Default uses gifski if available.
+#' @param debug Logical; emit debug messages (default FALSE)
+#' @param height_branches Column name for branch ages (default: "height_mean")
+#' @param height_hpd Column name for HPD ages (default: "height_median")
+#' @param level HPD level to display (default: "0.80" for 80% HPD)
+#' @param digits Decimal places for coordinate rounding (default: 2)
+#' @param map_pad Padding in degrees around data extent (default: 1)
+#' @param map_name Map database name from maps package (default: "world")
+#' @param map_fill Fill color for map polygons (default: "white")
+#' @param map_colour Outline color for map polygons (default: "gray50")
+#' @param arrow Arrow specification for branches (default: NULL)
+#' @param tip_stroke Stroke width for tip nodes (default: 1)
+#' @param ... Additional arguments passed to geoms
 #' @return A ggplot2 object (if animate=FALSE) or gganim object (if animate=TRUE)
 #' @export
+#' @examples
+#' \dontrun{
+#' data(wnv_tree)
+#'
+#' # Basic plot
+#' autoplot(wnv_tree, most_recent_sample = "2007-07-01")
+#'
+#' # With highlighting
+#' autoplot(wnv_tree,
+#'          most_recent_sample = "2007-07-01",
+#'          highlight_tips = c("WN99-flamingo383"))
+#'
+#' # Animation (requires gganimate)
+#' anim <- autoplot(wnv_tree,
+#'                  most_recent_sample = "2007-07-01",
+#'                  animate = TRUE, nframes = 50)
+#' }
 autoplot.treedata <- function(
   object,
-  debug = getOption("ggphylogeo.debug", FALSE),
-  show_map = TRUE,
+  most_recent_sample = NULL,
   lat = "location1",
   lon = "location2",
-  map_fill = "white",
-  map_colour = "gray50",
-  height_branches = "height_mean",
-  height_hpd = "height_median",
-  level = "0.80",
-  digits = 2,
-
-  map_pad = 1,
-  map_name = "world",
-  most_recent_sample = NULL,
-  curvature = -0.25,
-  arrow = NULL,
-  smooth = TRUE,
+  # Display options
+  show_map = TRUE,
   show_dispersion_legend = TRUE,
+  smooth = TRUE,
+  stream = FALSE,
+  curvature = -0.25,
+  # Highlighting
   highlight_tips = NULL,
   highlight_color = "red",
+  # Node styling
   tip_size = 3.5,
   node_size = 3,
   tip_stroke = 1,
   date_format = "%Y",
-  stream = FALSE,
-
-  # Animation parameters
+  # Animation
   animate = FALSE,
   nframes = 100,
   fps = 10,
+  end_pause = 20,
   renderer = NULL,
+  # Advanced options (rarely need changing)
+  debug = getOption("ggphylogeo.debug", FALSE),
+  height_branches = "height_mean",
+  height_hpd = "height_median",
+  level = "0.80",
+  digits = 2,
+  map_pad = 1,
+  map_name = "world",
+  map_fill = "white",
+  map_colour = "gray50",
+  arrow = NULL,
   ...
 ) {
 

@@ -6,115 +6,134 @@
 \usage{
 autoplot.treedata(
   object,
-  debug = getOption("ggphylogeo.debug", FALSE),
-  show_map = TRUE,
+  most_recent_sample = NULL,
   lat = "location1",
   lon = "location2",
-  map_fill = "white",
-  map_colour = "gray50",
-  height_branches = "height_mean",
-  height_hpd = "height_median",
-  level = "0.80",
-  digits = 2,
-  map_pad = 1,
-  map_name = "world",
-  most_recent_sample = NULL,
-  curvature = -0.25,
-  arrow = NULL,
-  smooth = TRUE,
+  show_map = TRUE,
   show_dispersion_legend = TRUE,
+  smooth = TRUE,
+  stream = FALSE,
+  curvature = -0.25,
   highlight_tips = NULL,
   highlight_color = "red",
   tip_size = 3.5,
   node_size = 3,
   tip_stroke = 1,
   date_format = "\%Y",
-  stream = FALSE,
   animate = FALSE,
   nframes = 100,
   fps = 10,
+  end_pause = 20,
   renderer = NULL,
+  debug = getOption("ggphylogeo.debug", FALSE),
+  height_branches = "height_mean",
+  height_hpd = "height_median",
+  level = "0.80",
+  digits = 2,
+  map_pad = 1,
+  map_name = "world",
+  map_fill = "white",
+  map_colour = "gray50",
+  arrow = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{treedata object with phylogeographic annotations}
+\item{object}{A treedata object with phylogeographic annotations from
+\code{treeio::read.beast()}}
 
-\item{debug}{logical; emit debug messages}
+\item{most_recent_sample}{Date, numeric year (e.g. 2019), or "YYYY-MM-DD"
+string for calibrating ages to real dates. If NULL, ages remain as
+numeric heights.}
 
-\item{show_map}{logical; overlay map background}
+\item{lat}{Name of latitude coordinate column (default: "location1")}
 
-\item{lat}{name of latitude column}
+\item{lon}{Name of longitude coordinate column (default: "location2")}
 
-\item{lon}{name of longitude column}
+\item{show_map}{Logical; overlay world map background (default TRUE)}
 
-\item{map_fill}{fill color for map polygons}
+\item{show_dispersion_legend}{Logical; show legend explaining branch
+curvature direction (default TRUE)}
 
-\item{map_colour}{outline color for map polygons}
+\item{smooth}{Logical; smooth HPD polygons for visual appeal (default TRUE)}
 
-\item{height_branches}{column used for branch ages}
+\item{stream}{Logical; use stream-style branch plotting with fade effect
+(default FALSE)}
 
-\item{height_hpd}{column used for HPD ages}
+\item{curvature}{Curvature of branch curves (default -0.25). Positive values
+curve left, negative curve right.}
 
-\item{level}{HPD level (e.g., "0.80" for 80\% HPD)}
+\item{highlight_tips}{Character vector of tip labels to highlight with
+special styling}
 
-\item{digits}{decimal rounding for coordinates}
+\item{highlight_color}{Color for highlighted tips (default "red")}
 
-\item{map_pad}{padding (degrees) for map extent}
+\item{tip_size}{Size of tip nodes (default 3.5)}
 
-\item{map_name}{map database name (e.g., "world", "usa", "state")}
+\item{node_size}{Size of internal nodes (default 3)}
 
-\item{most_recent_sample}{date/year used to calibrate age to real
-dates. Can be Date, POSIXt, numeric year (e.g., 2019), or character
-"YYYY-MM-DD"}
+\item{tip_stroke}{Stroke width for tip nodes (default: 1)}
 
-\item{curvature}{curvature of branch curves (default 0.3)}
+\item{date_format}{Format string for date axis labels (default "\%Y")}
 
-\item{arrow}{arrow specification for branches (see grid::arrow)}
+\item{animate}{Logical; create animated plot showing temporal progression
+(default FALSE). Requires gganimate and gifski packages.}
 
-\item{show_dispersion_legend}{logical; show mini legend explaining branch
-dispersion (default FALSE)}
+\item{nframes}{Number of frames for animation (default 100)}
 
-\item{highlight_tips}{character vector of tip labels to highlight}
+\item{fps}{Frames per second for animation (default 10)}
 
-\item{highlight_color}{color for highlighted tips (default "red")}
+\item{end_pause}{Frames to pause at end of animation (default 20)}
 
-\item{tip_size}{size of tip nodes (default 3.5)}
+\item{renderer}{gganimate renderer function. Default uses gifski if available.}
 
-\item{node_size}{size of internal nodes (default 3)}
+\item{debug}{Logical; emit debug messages (default FALSE)}
 
-\item{tip_stroke}{stroke width for tip nodes (default 1)}
+\item{height_branches}{Column name for branch ages (default: "height_mean")}
 
-\item{date_format}{format string for date labels (default "\%Y")}
+\item{height_hpd}{Column name for HPD ages (default: "height_median")}
 
-\item{stream}{logical; use stream plotting (default FALSE)}
+\item{level}{HPD level to display (default: "0.80" for 80\% HPD)}
 
-\item{animate}{logical; create animated plot accumulating over time (default FALSE)}
+\item{digits}{Decimal places for coordinate rounding (default: 2)}
 
-\item{nframes}{number of frames for animation (default 100)}
+\item{map_pad}{Padding in degrees around data extent (default: 1)}
 
-\item{fps}{frames per second for animation (default 10)}
+\item{map_name}{Map database name from maps package (default: "world")}
 
-\item{renderer}{gganimate renderer function (default gifski_renderer())}
+\item{map_fill}{Fill color for map polygons (default: "white")}
 
-\item{...}{passed to geoms}
+\item{map_colour}{Outline color for map polygons (default: "gray50")}
 
-\item{map_alpha}{transparency for map polygons (0-1)}
+\item{arrow}{Arrow specification for branches (default: NULL)}
 
-\item{shadow_alpha}{alpha transparency for accumulated past data (default 0.3)}
-
-\item{shadow_size}{size multiplier for accumulated past data (default 0.8)}
-
-\item{shadow_colour}{colour for accumulated past data (default NULL, uses same as current)}
-
-\item{end_pause}{number of frames to pause at end of animation (default 20)}
+\item{...}{Additional arguments passed to geoms}
 }
 \value{
 A ggplot2 object (if animate=FALSE) or gganim object (if animate=TRUE)
 }
 \description{
 Creates a ggplot2 visualization of continuous phylogeographic data from
-BEAST analyses. Supports various customization options including map
-backgrounds, tip highlighting, dispersion legends, and animated accumulation
-over time.
+BEAST analyses. For simple quick plots, this function provides sensible
+defaults. For custom visualizations, use \code{build_phylogeo()} with the
+individual geom functions (\code{geom_phylo_branches()}, \code{geom_phylo_hpd()},
+\code{geom_phylo_nodes()}).
+}
+\examples{
+\dontrun{
+data(wnv_tree)
+
+# Basic plot
+autoplot(wnv_tree, most_recent_sample = "2007-07-01")
+
+# With highlighting
+autoplot(wnv_tree,
+         most_recent_sample = "2007-07-01",
+         highlight_tips = c("WN99-flamingo383"))
+
+# Animation (requires gganimate)
+anim <- autoplot(wnv_tree,
+                 most_recent_sample = "2007-07-01",
+                 animate = TRUE, nframes = 50)
+}
 }

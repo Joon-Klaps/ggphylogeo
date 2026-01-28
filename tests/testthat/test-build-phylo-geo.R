@@ -22,7 +22,8 @@ test_that("build_phylogeo returns a phylo_phylogeo object and geoms accept it", 
   layers <- p$layers
 
   expect_true(any(sapply(layers, function(l) inherits(l$geom, "GeomPath"))))
-  expect_true(any(sapply(layers, function(l) inherits(l$geom, "GeomPolygon"))))
+  # geom_phylo_hpd uses GeomSf when smooth=TRUE (default) or GeomPolygon when smooth=FALSE
+  expect_true(any(sapply(layers, function(l) inherits(l$geom, "GeomPolygon") || inherits(l$geom, "GeomSf"))))
   expect_true(any(sapply(layers, function(l) inherits(l$geom, "GeomPoint"))))
 })
 

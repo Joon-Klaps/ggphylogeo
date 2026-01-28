@@ -8,6 +8,14 @@
 \description{
 Visualisation tools for BEAST-style continuous phylogeographic analyses.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/Joon-Klaps/ggphylogeo}
+  \item Report bugs at \url{https://github.com/Joon-Klaps/ggphylogeo/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Joon Klaps \email{joon.klaps@example.com}
 

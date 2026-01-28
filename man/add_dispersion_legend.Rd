@@ -10,6 +10,8 @@ add_dispersion_legend(bbox, curvature = -0.3, text_size = 2.5)
 \item{bbox}{list with xlim and ylim from \code{get_data_bbox()}}
 
 \item{curvature}{curvature value used in the main plot}
+
+\item{text_size}{text size for the legend labels (default: 2.5)}
 }
 \value{
 A list of ggplot2 annotation layers that can be added to a ggplot object

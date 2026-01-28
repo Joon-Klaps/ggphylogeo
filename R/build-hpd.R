@@ -1,20 +1,26 @@
 #' Build HPD polygons for continuous phylogeography
 #'
-#' @param treedata treedata object with phylogeographic annotations
-#' @param level character HPD level to use in column names (e.g. "0.80")
-#' @param lon name of longitude column prefix (default: "location1")
-#' @param lat name of latitude column prefix (default: "location2")
-#' @param height column name used for HPD polygon ages (default: "height_median")
-#' @param debug logical debug messages
-#' @param most_recent_sample Date or numeric year (e.g. 2019) used to calibrate
-#'   ages to actual dates. If NULL (default) no calibration is performed.
-#' @return A data.frame with columns: node, polygon, lon, lat, ageParent, age,
-#'   group; or NULL if no valid HPD polygons found.
+#' Extracts highest posterior density (HPD) uncertainty regions from a BEAST
+#' continuous phylogeographic analysis. Each node may have multiple HPD polygons
+#' representing the spatial uncertainty of its location estimate.
+#'
+#' @param treedata treedata object with phylogeographic annotations from
+#'   `treeio::read.beast()`
+#' @param level character HPD level to use (e.g. "0.80" for 80% HPD)
+#' @param lon name of longitude coordinate column prefix (default: "location1")
+#' @param lat name of latitude coordinate column prefix (default: "location2")
+#' @param height column name for node ages (default: "height_median")
+#' @param most_recent_sample Date, numeric year, or "YYYY-MM-DD" string for
+#'   calibrating ages to real dates. If NULL, ages remain as numeric heights.
+#' @param debug logical; emit debug messages
+#' @return A data.frame with columns: node, polygon, lon, lat, age, group;
+#'   or NULL if no valid HPD polygons found.
 #' @export
 build_hpd <- function(
   treedata,
   level = "0.80",
   lon = "location1",
+
   lat = "location2",
   height = "height_median",
   most_recent_sample = NULL,
@@ -28,106 +34,118 @@ build_hpd <- function(
   }
 
   d <- treedata@data
-  t <- treedata@phylo
+  phy <- treedata@phylo
+  key <- match_nodes(phy, d)
 
-  # Get row index for each node ID (1..Nnodes)
-  key <- match_nodes(t, d)
-
-  # Identify HPD columns
-  lon_pattern <- paste0("^", lon, "_", level, "HPD_")
-  lat_pattern <- paste0("^", lat, "_", level, "HPD_")
-
-  loncols <- grep(lon_pattern, names(d), value = TRUE)
-  latcols <- grep(lat_pattern, names(d), value = TRUE)
-
-  # Natural sort to ensure _1, _2, _10 match up
-  loncols <- loncols[order(nchar(loncols), loncols)]
-  latcols <- latcols[order(nchar(latcols), latcols)]
-
-  if (length(loncols) == 0 || length(latcols) == 0) {
+ # Find HPD columns and sort naturally
+  hpd_cols <- find_hpd_columns(names(d), lon, lat, level)
+  if (is.null(hpd_cols)) {
     if (debug) message("build_hpd: no HPD columns found")
     return(NULL)
   }
 
-  if (length(loncols) != length(latcols)) {
-    warning("Mismatch in number of longitude/latitude HPD columns; HPDs may be incorrect.")
-  }
-
-  n_poly <- min(length(loncols), length(latcols))
-
-  # Get height for each node
+  # Get calibrated node ages
   node_ages <- get_node_vals(treedata, height)
-
   if (!is.null(most_recent_sample)) {
     node_ages <- calibrate_age(node_ages, most_recent_sample, debug = debug)
   }
 
-  # Pre-allocate list for better performance
-  polys_list <- vector("list", length(key) * n_poly)
-  poly_idx <- 1L
+  # Extract polygons for all nodes
+  polys <- extract_hpd_polygons(d, key, node_ages, hpd_cols)
 
-  # Iterate over all nodes
-  for (i in seq_along(key)) {
-    row_idx <- key[i]
-
-    # Skip if invalid row or height
-    if (is.na(row_idx)) next
-
-    age_val <- node_ages[i]
-    if (is.na(age_val)) next
-
-    # Process each polygon for this node
-    for (j in seq_len(n_poly)) {
-      lons_vec <- d[[loncols[j]]][[row_idx]]
-      lats_vec <- d[[latcols[j]]][[row_idx]]
-
-      # Skip invalid polygons
-      if (is.null(lons_vec) || is.null(lats_vec) ||
-          length(lons_vec) < 3 || length(lats_vec) < 3 ||
-          any(is.na(lons_vec)) || any(is.na(lats_vec))) {
-        next
-      }
-
-      # Ensure equal lengths
-      if (length(lons_vec) != length(lats_vec)) {
-        warning(sprintf("Node %d polygon %d: lon/lat length mismatch (%d vs %d)",
-                        i, j, length(lons_vec), length(lats_vec)))
-        next
-      }
-
-      # Get the number of points in this polygon
-      n_pts <- length(lons_vec)
-
-      # Create polygon data frame with explicit lengths
-      polys_list[[poly_idx]] <- data.frame(
-        node = rep(i, n_pts),
-        polygon = rep(j, n_pts),
-        lon = as.numeric(lons_vec),
-        lat = as.numeric(lats_vec),
-        age = rep(age_val, n_pts),
-        group = rep(paste(i, j, sep = "-"), n_pts),
-        stringsAsFactors = FALSE,
-        row.names = NULL
-      )
-      poly_idx <- poly_idx + 1L
-    }
-  }
-
-  # Remove NULL entries and combine
-  polys_list <- polys_list[!sapply(polys_list, is.null)]
-
-  if (length(polys_list) == 0) {
+  if (is.null(polys) || nrow(polys) == 0) {
     if (debug) message("build_hpd: no polygons generated")
     return(NULL)
   }
-
-  polys <- do.call(rbind, polys_list)
 
   if (debug) {
     message(sprintf("build_hpd: created %d polygon points across %d polygons",
                     nrow(polys), length(unique(polys$group))))
   }
 
-  # Order by age for consistent layering (oldest/highest first)
+  # Order by age (oldest first) for proper layering
   polys[order(polys$age, decreasing = TRUE), , drop = FALSE]
+}
+
+#' Find and validate HPD column names
+#' @noRd
+find_hpd_columns <- function(colnames, lon, lat, level) {
+  lon_pattern <- paste0("^", lon, "_", level, "HPD_")
+  lat_pattern <- paste0("^", lat, "_", level, "HPD_")
+
+  loncols <- grep(lon_pattern, colnames, value = TRUE)
+  latcols <- grep(lat_pattern, colnames, value = TRUE)
+
+  # Natural sort (handles _1, _2, _10 correctly)
+  loncols <- loncols[order(nchar(loncols), loncols)]
+  latcols <- latcols[order(nchar(latcols), latcols)]
+
+  if (length(loncols) == 0 || length(latcols) == 0) return(NULL)
+
+  if (length(loncols) != length(latcols)) {
+    warning("Mismatch in lon/lat HPD column counts; using minimum.")
+  }
+
+  n <- min(length(loncols), length(latcols))
+  list(lon = loncols[seq_len(n)], lat = latcols[seq_len(n)])
+}
+
+#' Extract HPD polygon coordinates for all nodes
+#' @noRd
+extract_hpd_polygons <- function(data, key, node_ages, hpd_cols) {
+  n_poly <- length(hpd_cols$lon)
+  results <- vector("list", length(key) * n_poly)
+  idx <- 1L
+
+  for (i in seq_along(key)) {
+    row_idx <- key[i]
+    age_val <- node_ages[i]
+
+    # Skip invalid nodes
+    if (is.na(row_idx) || is.na(age_val)) next
+
+    for (j in seq_len(n_poly)) {
+      poly_df <- create_polygon_df(
+        data, row_idx, i, j, age_val,
+        hpd_cols$lon[j], hpd_cols$lat[j]
+      )
+
+      if (!is.null(poly_df)) {
+        results[[idx]] <- poly_df
+        idx <- idx + 1L
+      }
+    }
+  }
+
+  # Combine non-NULL results
+  results <- results[!vapply(results, is.null, logical(1))]
+  if (length(results) == 0) return(NULL)
+
+  do.call(rbind, results)
+}
+
+#' Create a single polygon data frame
+#' @noRd
+create_polygon_df <- function(data, row_idx, node_id, poly_id, age, lon_col, lat_col) {
+  lons <- data[[lon_col]][[row_idx]]
+  lats <- data[[lat_col]][[row_idx]]
+
+  # Validate polygon data
+  if (is.null(lons) || is.null(lats) ||
+      length(lons) < 3 || length(lats) < 3 ||
+      length(lons) != length(lats) ||
+      any(is.na(lons)) || any(is.na(lats))) {
+    return(NULL)
+  }
+
+  n_pts <- length(lons)
+  data.frame(
+    node = rep(node_id, n_pts),
+    polygon = rep(poly_id, n_pts),
+    lon = as.numeric(lons),
+    lat = as.numeric(lats),
+    age = rep(age, n_pts),
+    group = rep(paste(node_id, poly_id, sep = "-"), n_pts),
+    stringsAsFactors = FALSE
+  )
 }

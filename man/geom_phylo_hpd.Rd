@@ -14,18 +14,34 @@ geom_phylo_hpd(
 )
 }
 \arguments{
-\item{mapping}{Aesthetic mappings, created with ggplot2::aes().}
+\item{mapping}{Aesthetic mappings created with \code{ggplot2::aes()}. If NULL,
+uses default mapping: \code{aes(x = lon, y = lat, group = group, fill = age)}.}
 
-\item{data}{A data frame or \code{phylo_phylogeo} object containing HPD polygons.}
+\item{data}{A data.frame with HPD polygon data or a \code{phylo_phylogeo} object.
+Must contain columns: lon, lat, group, age.}
 
-\item{alpha}{numeric transparency level (0-1), default 0.5}
+\item{alpha}{Numeric transparency (0-1). Default 0.5.}
 
-\item{smooth}{logical; whether to smooth HPD polygons (default TRUE)}
+\item{smooth}{Logical; apply kernel smoothing to polygons. Default TRUE.
+Set FALSE for faster rendering or when smoothing causes issues.}
 
-\item{smoothness}{numeric smoothing parameter (passed to smoothr)}
+\item{smoothness}{Numeric smoothing intensity (default 1). Higher values
+produce smoother polygons but may distort small features.}
 
-\item{...}{Other arguments passed to ggplot2::geom_sf.}
+\item{...}{Additional arguments passed to the underlying geom.}
+}
+\value{
+A ggplot2 layer.
 }
 \description{
-Phylogeographic HPD polygons
+Plots highest posterior density (HPD) uncertainty regions as filled polygons.
+By default, polygons are smoothed using kernel smoothing for visual appeal.
+Polygons are filled by age to match the temporal color scale of branches.
+}
+\examples{
+\dontrun{
+data(wnv_tree)
+pgeo <- build_phylogeo(wnv_tree)
+ggplot() + geom_phylo_hpd(data = pgeo$hpd, alpha = 0.3)
+}
 }

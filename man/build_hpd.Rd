@@ -15,25 +15,28 @@ build_hpd(
 )
 }
 \arguments{
-\item{treedata}{treedata object with phylogeographic annotations}
+\item{treedata}{treedata object with phylogeographic annotations from
+\code{treeio::read.beast()}}
 
-\item{level}{character HPD level to use in column names (e.g. "0.80")}
+\item{level}{character HPD level to use (e.g. "0.80" for 80\% HPD)}
 
-\item{lon}{name of longitude column prefix (default: "location1")}
+\item{lon}{name of longitude coordinate column prefix (default: "location1")}
 
-\item{lat}{name of latitude column prefix (default: "location2")}
+\item{lat}{name of latitude coordinate column prefix (default: "location2")}
 
-\item{height}{column name used for HPD polygon ages (default: "height_median")}
+\item{height}{column name for node ages (default: "height_median")}
 
-\item{most_recent_sample}{Date or numeric year (e.g. 2019) used to calibrate
-ages to actual dates. If NULL (default) no calibration is performed.}
+\item{most_recent_sample}{Date, numeric year, or "YYYY-MM-DD" string for
+calibrating ages to real dates. If NULL, ages remain as numeric heights.}
 
-\item{debug}{logical debug messages}
+\item{debug}{logical; emit debug messages}
 }
 \value{
-A data.frame with columns: node, polygon, lon, lat, ageParent, age,
-group; or NULL if no valid HPD polygons found.
+A data.frame with columns: node, polygon, lon, lat, age, group;
+or NULL if no valid HPD polygons found.
 }
 \description{
-Build HPD polygons for continuous phylogeography
+Extracts highest posterior density (HPD) uncertainty regions from a BEAST
+continuous phylogeographic analysis. Each node may have multiple HPD polygons
+representing the spatial uncertainty of its location estimate.
 }

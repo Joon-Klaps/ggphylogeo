@@ -59,6 +59,7 @@ get_data_bbox <- function(segs, hpd, pad = 1) {
 #'
 #' @param bbox list with xlim and ylim from `get_data_bbox()`
 #' @param curvature curvature value used in the main plot
+#' @param text_size text size for the legend labels (default: 2.5)
 #' @return A list of ggplot2 annotation layers that can be added to a ggplot object
 #' @examples
 #' bbox <- list(xlim = c(-10, 10), ylim = c(-5, 5))

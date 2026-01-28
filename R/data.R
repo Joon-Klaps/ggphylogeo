@@ -69,25 +69,26 @@
 "hiv1_tree"
 
 
-#' Influenza A H3N2 continuous trait tree
-#'
+#' Influenza A H3N2 antigenic cartography tree
 #'
 #' A treedata object containing the maximum clade credibility (MCC) tree
 #' from a BEAST continuous trait analysis of Influenza A H3N2 sequences.
+#' This dataset demonstrates using ggphylogeo with non-geographic continuous
+#' traits (antigenic dimensions).
 #'
-#' @format A treedata object with phylogeographic annotations including:
+#' @format A treedata object with continuous trait annotations including:
 #' \describe{
-#'  \item{antigentic1}{trait one}
-#'  \item{antigentic2}{trait two}
-#' \item{height_mean}{Mean node height (time before present)}
-#' \item{height_median}{Median node height}
-#' \item{antigentic1_0.80HPD}{80 percent HPD intervals for trait one}
-#' \item{antigentic2_0.80HPD}{80 percent HPD intervals for trait two}
+#'   \item{antigenic1}{First antigenic dimension coordinate}
+#'   \item{antigenic2}{Second antigenic dimension coordinate}
+#'   \item{height_mean}{Mean node height (time before present)}
+#'   \item{height_median}{Median node height}
+#'   \item{antigenic1_0.80HPD}{80 percent HPD intervals for dimension 1}
+#'   \item{antigenic2_0.80HPD}{80 percent HPD intervals for dimension 2}
 #' }
 #' @source BEAST continuous trait analysis
 #' @examples
 #' \dontrun{
 #' data(h3n2_tree)
-#' autoplot(h3n2_tree, most_recent_sample = "2015-12-31", lon = "antigentic1", lat = "antigentic2")
+#' pgeo <- build_phylogeo(h3n2_tree, lon = "antigenic1", lat = "antigenic2")
 #' }
 "h3n2_tree"
