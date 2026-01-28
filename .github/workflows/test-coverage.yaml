@@ -1,14 +1,13 @@
-# Workflow for running tests with devtools::test()
+name: test-coverage
+
 on:
     push:
         branches: [main, master]
     pull_request:
         branches: [main, master]
 
-name: test-coverage
-
 jobs:
-    test:
+    test-coverage:
         runs-on: ubuntu-latest
         env:
             GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -22,19 +21,19 @@ jobs:
 
             - uses: r-lib/actions/setup-r-dependencies@v2
               with:
-                  extra-packages: any::covr, any::testthat
+                  # We need covr to run tests, and xml2 to export the report format
+                  extra-packages: any::covr, any::testthat, any::xml2
                   needs: coverage
 
-            - name: Run tests
+            - name: Calculate Coverage
               run: |
-                  Rscript -e 'devtools::test()'
-
-            - name: Test coverage
-              run: |
-                  covr::codecov(
-                    quiet = FALSE,
-                    clean = FALSE,
-                    install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
-                  )
+                  # calculate coverage and export to coverage.xml
+                  covr::to_cobertura(covr::package_coverage())
               shell: Rscript {0}
-              continue-on-error: true
+
+            - name: Upload to codecov.io
+              uses: codecov/codecov-action@v5
+              with:
+                  fail_ci_if_error: true
+                  files: ./cobertura.xml
+                  token: ${{ secrets.CODECOV_TOKEN }}

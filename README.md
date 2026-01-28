@@ -40,6 +40,15 @@ autoplot(yfv_tree, most_recent_sample = "2017-04-22")
 
 ![YFV phylogeography](inst/extras/yfv.png)
 
+or with thicker branches, use the option 'stream = TRUE':
+
+```
+data(hiv1_tree)
+autoplot.treedata(hiv1_tree, show_dispersion_legend=FALSE, stream=TRUE)
+```
+
+![HIV-1 phylogeography](inst/extras/hiv1.png)
+
 ## Detailed Plotting
 
 For custom visualizations, build plots layer by layer using the three main geoms:
@@ -83,6 +92,87 @@ ggplot() +
 ```
 
 ![WNV phylogeography](inst/extras/wnv_animation.gif)
+
+> Note: This code was for a static plot, the gif shows an animated version, see below.
+
+One can also further customize the plot with more detailed map backgrounds from `rnaturalearth` and its `sf` objects.
+
+### Downloading Map Data
+
+```r
+library(rnaturalearth)
+library(dplyr)
+# Get countries using ne_download
+countries <- ne_download(scale = 10, type = "countries", category = "cultural", returnclass = "sf")
+
+# Filter for US, Mexico, Canada, Cuba
+north_america <- countries[countries$ADMIN %in% c("United States of America", "Mexico", "Canada", "Cuba"), ]
+
+# Or if you want state/province level detail
+states <- ne_download(scale = 10, type = "admin_1_states_provinces", category = "cultural", returnclass = "sf")
+
+# Filter for the three countries
+north_am_states <- states[states$admin %in% c("United States of America", "Mexico", "Canada", "Cuba"), ]
+# 2. Lakes
+lakes <- ne_download(scale = 10, type = "lakes", category = "physical", returnclass = "sf")
+
+# 3. Major cities
+cities <- ne_download(scale = 10, type = "populated_places", category = "cultural", returnclass = "sf")
+```
+
+### Using sf Map Data in ggplot2
+
+```r
+mapplot <- ggplot() +
+  # State borders (thin, light)
+  geom_sf(data = north_am_states, fill = "white", color = "gray70", size = 0.2) +
+  # Country borders (thick, dark) - add this layer on top
+  geom_sf(data = north_america, fill = NA, color = "gray30", size = 1) +
+  # Lakes
+  geom_sf(data = lakes, fill = "lightblue", color = "steelblue", alpha = 0.6) +
+  # Cities
+  geom_sf(data = cities[cities$ADM0NAME %in% c("United States of America", "Mexico", "Canada", "Cuba") &
+                        cities$POP_MAX > 2000000, ],
+          color = "red", size = 2) +
+  # City labels
+  geom_sf_text(data = cities[cities$ADM0NAME %in% c("United States of America", "Mexico", "Canada", "Cuba") &
+                             cities$POP_MAX > 2000000, ],
+               aes(label = NAME),
+               size = 4.5, nudge_y = 0.8, check_overlap = TRUE)
+
+mapplot +
+    coord_sf(xlim = c(-170, -50), ylim = c(5, 75), expand = FALSE) +
+    theme_minimal()
+```
+
+![North America Map](inst/extras/na_map.png)
+
+### Plotting the phylogeo layers on top of the map
+
+```r
+data(wnv_tree)
+wnv_phylogeo <- build_phylogeo(wnv_tree, most_recent_sample = "2007-07-01")
+
+wnv_plot <- mapplot +
+    geom_phylo_hpd(data = wnv_phylogeo$hpd, alpha = 0.2) +
+    geom_phylo_branches(data = wnv_phylogeo$branches) +
+    scale_fill_viridis_c(name="Year", direction= -1,
+      labels = function(x) format(as.Date(x), "%Y"),
+      breaks =  seq(as.Date("1997-01-01"), as.Date("2008-01-01"),by = "2 year")
+    ) +
+    theme_phylogeo() +
+    guides_phylogeo() +
+    coord_sf(
+      xlim = wnv_phylogeo$viewbox$xlim,
+      ylim = wnv_phylogeo$viewbox$ylim
+    )
+
+wnv_plot +
+    geom_phylo_nodes(data = wnv_phylogeo$nodes, size = 2.5) +
+    add_dispersion_legend(wnv_phylogeo$viewbox, text_size = 4 )
+```
+
+![WNV phylogeography with detailed map](inst/extras/wnv_polished.png)
 
 ## Non-Geographic Data
 
@@ -170,6 +260,8 @@ data(wnv_tree)
 # Launch interactive viewer
 run_phylogeo_app(wnv_tree, most_recent_sample = "2007-07-01")
 ```
+
+![Shiny screenshot](inst/extras/wnv_shiny.png)
 
 The Shiny app provides:
 
