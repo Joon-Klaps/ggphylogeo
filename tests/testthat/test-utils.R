@@ -80,46 +80,46 @@ test_that("get_data_bbox combines segment and hpd data", {
   expect_equal(bbox$ylim, c(35, 60))
 })
 
-test_that("calibrate_endheight returns unchanged input when mrs is NULL", {
-  heights <- c(1, 2, 3)
-  result <- calibrate_endheight(heights, NULL)
-  expect_equal(result, heights)
+test_that("calibrate_age returns unchanged input when mrs is NULL", {
+  ages <- c(1, 2, 3)
+  result <- calibrate_age(ages, NULL)
+  expect_equal(result, ages)
 })
 
-test_that("calibrate_endheight converts to Date with Date input", {
-  heights <- c(0, 1, 10)  # years before mrs
+test_that("calibrate_age converts to Date with Date input", {
+  ages <- c(0, 1, 10)  # years before mrs
   mrs <- as.Date("2020-01-01")
 
-  result <- calibrate_endheight(heights, mrs)
+  result <- calibrate_age(ages, mrs)
 
   expect_s3_class(result, "Date")
   expect_equal(result[1], mrs)  # 0 years before = same date
 })
 
-test_that("calibrate_endheight accepts character date string", {
-  heights <- c(0, 1, 10)
-  result <- calibrate_endheight(heights, "2020-01-01")
+test_that("calibrate_age accepts character date string", {
+  ages <- c(0, 1, 10)
+  result <- calibrate_age(ages, "2020-01-01")
 
   expect_s3_class(result, "Date")
 })
 
-test_that("calibrate_endheight accepts numeric year", {
-  heights <- c(0, 1, 10)
-  result <- calibrate_endheight(heights, 2020)
+test_that("calibrate_age accepts numeric year", {
+  ages <- c(0, 1, 10)
+  result <- calibrate_age(ages, 2020)
 
   expect_s3_class(result, "Date")
 })
 
-test_that("calibrate_endheight errors on invalid mrs", {
-  heights <- c(0, 1, 10)
+test_that("calibrate_age errors on invalid mrs", {
+  ages <- c(0, 1, 10)
 
-  expect_error(calibrate_endheight(heights, "invalid"))
-  expect_error(calibrate_endheight(heights, 500))  # Not a valid year
+  expect_error(calibrate_age(ages, "invalid"))
+  expect_error(calibrate_age(ages, 500))  # Not a valid year
 })
 
-test_that("calibrate_endheight handles NA values", {
-  heights <- c(0, NA, 10)
-  result <- calibrate_endheight(heights, "2020-01-01")
+test_that("calibrate_age handles NA values", {
+  ages <- c(0, NA, 10)
+  result <- calibrate_age(ages, "2020-01-01")
 
   expect_s3_class(result, "Date")
   expect_true(is.na(result[2]))
@@ -127,11 +127,11 @@ test_that("calibrate_endheight handles NA values", {
   expect_false(is.na(result[3]))
 })
 
-test_that("add_direction_legend returns list of ggplot2 layers", {
+test_that("add_dispersion_legend returns list of ggplot2 layers", {
   skip_if_not_installed("ggplot2")
 
   bbox <- list(xlim = c(-100, -80), ylim = c(25, 45))
-  legend <- add_direction_legend(bbox, curvature = 0.25)
+  legend <- add_dispersion_legend(bbox, curvature = 0.25)
 
   expect_type(legend, "list")
   expect_gt(length(legend), 0)

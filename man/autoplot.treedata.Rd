@@ -2,7 +2,7 @@
 % Please edit documentation in R/autoplot.R
 \name{autoplot.treedata}
 \alias{autoplot.treedata}
-\title{Autoplot continuous phylogeography}
+\title{Autoplot continuous phylogeography with optional animation}
 \usage{
 autoplot.treedata(
   object,
@@ -10,19 +10,19 @@ autoplot.treedata(
   show_map = TRUE,
   lat = "location1",
   lon = "location2",
-  map_fill = "gray95",
+  map_fill = "white",
   map_colour = "gray50",
   height_branches = "height_mean",
   height_hpd = "height_median",
   level = "0.80",
   digits = 2,
-  map_alpha = 0.5,
   map_pad = 1,
   map_name = "world",
   most_recent_sample = NULL,
-  curvature = 0.25,
+  curvature = -0.25,
   arrow = NULL,
-  show_direction_legend = TRUE,
+  smooth = TRUE,
+  show_dispersion_legend = TRUE,
   highlight_tips = NULL,
   highlight_color = "red",
   tip_size = 3.5,
@@ -30,6 +30,10 @@ autoplot.treedata(
   tip_stroke = 1,
   date_format = "\%Y",
   stream = FALSE,
+  animate = FALSE,
+  nframes = 100,
+  fps = 10,
+  renderer = NULL,
   ...
 )
 }
@@ -48,21 +52,19 @@ autoplot.treedata(
 
 \item{map_colour}{outline color for map polygons}
 
-\item{height_branches}{column used for branch heights}
+\item{height_branches}{column used for branch ages}
 
-\item{height_hpd}{column used for HPD heights}
+\item{height_hpd}{column used for HPD ages}
 
 \item{level}{HPD level (e.g., "0.80" for 80\% HPD)}
 
 \item{digits}{decimal rounding for coordinates}
 
-\item{map_alpha}{transparency for map polygons (0-1)}
-
 \item{map_pad}{padding (degrees) for map extent}
 
 \item{map_name}{map database name (e.g., "world", "usa", "state")}
 
-\item{most_recent_sample}{date/year used to calibrate endheight to real
+\item{most_recent_sample}{date/year used to calibrate age to real
 dates. Can be Date, POSIXt, numeric year (e.g., 2019), or character
 "YYYY-MM-DD"}
 
@@ -70,8 +72,8 @@ dates. Can be Date, POSIXt, numeric year (e.g., 2019), or character
 
 \item{arrow}{arrow specification for branches (see grid::arrow)}
 
-\item{show_direction_legend}{logical; show mini legend explaining branch
-direction (default FALSE)}
+\item{show_dispersion_legend}{logical; show mini legend explaining branch
+dispersion (default FALSE)}
 
 \item{highlight_tips}{character vector of tip labels to highlight}
 
@@ -83,15 +85,36 @@ direction (default FALSE)}
 
 \item{tip_stroke}{stroke width for tip nodes (default 1)}
 
-\item{date_format}{format string for date labels (default "\\%Y")}
+\item{date_format}{format string for date labels (default "\%Y")}
+
+\item{stream}{logical; use stream plotting (default FALSE)}
+
+\item{animate}{logical; create animated plot accumulating over time (default FALSE)}
+
+\item{nframes}{number of frames for animation (default 100)}
+
+\item{fps}{frames per second for animation (default 10)}
+
+\item{renderer}{gganimate renderer function (default gifski_renderer())}
 
 \item{...}{passed to geoms}
+
+\item{map_alpha}{transparency for map polygons (0-1)}
+
+\item{shadow_alpha}{alpha transparency for accumulated past data (default 0.3)}
+
+\item{shadow_size}{size multiplier for accumulated past data (default 0.8)}
+
+\item{shadow_colour}{colour for accumulated past data (default NULL, uses same as current)}
+
+\item{end_pause}{number of frames to pause at end of animation (default 20)}
 }
 \value{
-A ggplot2 object
+A ggplot2 object (if animate=FALSE) or gganim object (if animate=TRUE)
 }
 \description{
 Creates a ggplot2 visualization of continuous phylogeographic data from
 BEAST analyses. Supports various customization options including map
-backgrounds, tip highlighting, and direction legends.
+backgrounds, tip highlighting, dispersion legends, and animated accumulation
+over time.
 }

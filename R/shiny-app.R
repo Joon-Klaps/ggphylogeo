@@ -10,8 +10,9 @@
 #' @param lat name of latitude column (default: "location1")
 #' @param most_recent_sample Date, numeric year, or "YYYY-MM-DD" string for
 #'   calibrating dates
-#' @param height_branches column for branch heights (default: "height_mean")
-#' @param height_hpd column for HPD heights (default: "height_median")
+#' @param stream logical; whether to use stream plotting style (default TRUE)
+#' @param height_branches column for branch ages (default: "height_mean")
+#' @param height_hpd column for HPD ages (default: "height_median")
 #' @param level HPD level (default: "0.80")
 #' @param ... Additional arguments passed to the app
 #' @return A Shiny app object (run with shiny::runApp or returns when run
@@ -58,7 +59,7 @@ run_phylogeo_app <- function(
   )
 
   # Time range for the video
-  time_range <- range(full_pgeo$nodes$endheight, na.rm = TRUE)
+  time_range <- range(full_pgeo$nodes$age, na.rm = TRUE)
 
   # Get tip labels for highlighting selection
   tip_labels <- unique(full_pgeo$nodes$label[full_pgeo$nodes$istip])
@@ -182,7 +183,7 @@ run_phylogeo_app <- function(
           p0 <- p0 + geom_phylo_branches(
               data = active_branches,
               curvature = 0.2,
-              ncp = 30,
+              ncp = 50,
               linewidth = 0.8
           )
         }
@@ -197,7 +198,7 @@ run_phylogeo_app <- function(
           nodes <- active_nodes
           nodes$tooltip <- paste0(
             "Label: ", nodes$label, "\n",
-            "Date: ", as.character(nodes$endheight), "\n",
+            "Date: ", as.character(nodes$age), "\n",
             "Lon: ", round(nodes$lon, 4), ", Lat: ", round(nodes$lat, 4)
           )
 
@@ -216,7 +217,7 @@ run_phylogeo_app <- function(
           if (nrow(internal_df) > 0) {
             p0 <- p0 + ggplot2::geom_point(
               data = internal_df,
-              ggplot2::aes(x = lon, y = lat, fill = as.numeric(endheight), text = tooltip),
+              ggplot2::aes(x = lon, y = lat, fill = as.numeric(age), text = tooltip),
               shape = 21,
               size = input$node_size,
               stroke = input$node_size * 0.3,
@@ -233,7 +234,7 @@ run_phylogeo_app <- function(
             if (nrow(normal_tips) > 0) {
               p0 <- p0 + ggplot2::geom_point(
                 data = normal_tips,
-                ggplot2::aes(x = lon, y = lat, fill = as.numeric(endheight), text = tooltip),
+                ggplot2::aes(x = lon, y = lat, fill = as.numeric(age), text = tooltip),
                 shape = 21,
                 size = input$tip_size,
                 stroke = input$tip_size * 0.3,
@@ -245,7 +246,7 @@ run_phylogeo_app <- function(
             if (nrow(highlighted_tips) > 0) {
               p0 <- p0 + ggplot2::geom_point(
                 data = highlighted_tips,
-                ggplot2::aes(x = lon, y = lat, fill = as.numeric(endheight), text = tooltip),
+                ggplot2::aes(x = lon, y = lat, fill = as.numeric(age), text = tooltip),
                 shape = 21,
                 size = input$tip_size * 1.3,
                 stroke = input$tip_size * 0.3,

@@ -7,17 +7,17 @@
 #' @param treedata treedata object with phylogeographic annotations
 #' @param lon name of longitude column (default: "location1")
 #' @param lat name of latitude column (default: "location2")
-#' @param height_branches column name for branch heights (default: "height_mean")
-#' @param height_hpd column name for HPD heights (default: "height_median")
+#' @param height_branches column name for branch ages (default: "height_mean")
+#' @param height_hpd column name for HPD ages (default: "height_median")
 #' @param level HPD level (default: "0.80")
 #' @param digits numeric digits for rounding coordinates (default: 2)
-#' @param most_recent_sample Date or numeric year (e.g. 2019) used to calibrate endheight to actual dates. If NULL (default) no calibration is performed.
+#' @param most_recent_sample Date or numeric year (e.g. 2019) used to calibrate age to actual dates. If NULL (default) no calibration is performed.
 #' @param debug logical debug messages
 #' @export
 build_phylogeo <- function(
   treedata,
-  lon = "location1",
-  lat = "location2",
+  lat = "location1",
+  lon = "location2",
   height_branches = "height_mean",
   height_hpd = "height_median",
   level = "0.80",
@@ -50,6 +50,10 @@ build_phylogeo <- function(
     debug = debug
   )
 
+  if (is.null(hpd) && debug) {
+    message("build_phylogeo: no HPD polygons built")
+  }
+
   nodes <- build_nodes(
       treedata,
       lon = lon,
@@ -59,6 +63,8 @@ build_phylogeo <- function(
       most_recent_sample = most_recent_sample,
       debug = debug
   )
+
+  viewbox <- get_data_bbox(branches, hpd)
 
   ## ---- Final sanity check --------------------------------------------------
   if (debug) {
@@ -74,7 +80,8 @@ build_phylogeo <- function(
     list(
       branches = branches,
       hpd = hpd,
-      nodes = nodes
+      nodes = nodes,
+      viewbox = viewbox
     ),
     class = "phylo_phylogeo"
   )

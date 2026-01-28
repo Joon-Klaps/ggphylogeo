@@ -4,14 +4,27 @@
 \alias{geom_phylo_hpd}
 \title{Phylogeographic HPD polygons}
 \usage{
-geom_phylo_hpd(mapping = NULL, data = NULL, alpha = 0.5, ...)
+geom_phylo_hpd(
+  mapping = NULL,
+  data = NULL,
+  alpha = 0.5,
+  smooth = TRUE,
+  smoothness = 1,
+  ...
+)
 }
 \arguments{
 \item{mapping}{Aesthetic mappings, created with ggplot2::aes().}
 
 \item{data}{A data frame or \code{phylo_phylogeo} object containing HPD polygons.}
 
-\item{...}{Other arguments passed on to ggplot2::geom_polygon.}
+\item{alpha}{numeric transparency level (0-1), default 0.5}
+
+\item{smooth}{logical; whether to smooth HPD polygons (default TRUE)}
+
+\item{smoothness}{numeric smoothing parameter (passed to smoothr)}
+
+\item{...}{Other arguments passed to ggplot2::geom_sf.}
 }
 \description{
 Phylogeographic HPD polygons

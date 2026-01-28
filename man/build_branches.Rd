@@ -21,18 +21,18 @@ build_branches(
 
 \item{lat}{name of latitude column (default: "location2")}
 
-\item{height}{column name used for branch heights (default: "height_mean")}
+\item{height}{column name used for branch ages (default: "height_mean")}
 
 \item{digits}{number of decimal places for rounding coordinates (default: 2)}
 
 \item{most_recent_sample}{Date or numeric year (e.g. 2019) used to calibrate
-endheight to actual dates. If NULL (default) no calibration is performed.}
+ages to actual dates. If NULL (default) no calibration is performed.}
 
 \item{debug}{logical debug messages}
 }
 \value{
 A data.frame with columns: startnode, endnode, lon, lat, lonend,
-latend, startheight, endheight, istip, label
+latend, ageParent, age, istip, label
 }
 \description{
 Constructs a data frame of branch segments for phylogeographic visualization.

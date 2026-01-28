@@ -7,13 +7,13 @@
 #' @param treedata treedata object with phylogeographic annotations
 #' @param lon name of longitude column (default: "location1")
 #' @param lat name of latitude column (default: "location2")
-#' @param height column name used for branch heights (default: "height_mean")
+#' @param height column name used for branch ages (default: "height_mean")
 #' @param digits number of decimal places for rounding coordinates (default: 2)
 #' @param most_recent_sample Date or numeric year (e.g. 2019) used to calibrate
-#'   endheight to actual dates. If NULL (default) no calibration is performed.
+#'   ages to actual dates. If NULL (default) no calibration is performed.
 #' @param debug logical debug messages
 #' @return A data.frame with columns: startnode, endnode, lon, lat, lonend,
-#'   latend, startheight, endheight, istip, label
+#'   latend, ageParent, age, istip, label
 #' @export
 build_branches <- function(
   treedata,
@@ -38,11 +38,11 @@ build_branches <- function(
   # Extract values for all nodes
   lons <- get_node_vals(treedata, lon)
   lats <- get_node_vals(treedata, lat)
-  heights <- get_node_vals(treedata, height)
+  ages <- get_node_vals(treedata, height)
 
-  # Calibrate heights if most_recent_sample provided
+  # Calibrate ages if most_recent_sample provided
   if (!is.null(most_recent_sample)) {
-    heights <- calibrate_endheight(heights, most_recent_sample, debug = debug)
+    ages <- calibrate_age(ages, most_recent_sample, debug = debug)
   }
 
   # Build labels for all nodes
@@ -60,8 +60,8 @@ build_branches <- function(
     lat         = round(lats[parent], digits),
     lonend      = round(lons[child], digits),
     latend      = round(lats[child], digits),
-    startheight = heights[parent],
-    endheight   = heights[child],
+    ageParent   = ages[parent],
+    age         = ages[child],
     istip       = child <= n_tips,
     label       = labels[child],
     stringsAsFactors = FALSE
@@ -76,6 +76,6 @@ build_branches <- function(
                     nrow(branch), sum(branch$istip), sum(!branch$istip)))
   }
 
-  # Order by endheight (descending) for proper layering
-  branch[order(branch$endheight, decreasing = TRUE), ]
+  # Order by age (descending) for proper layering
+  branch[order(branch$age, decreasing = TRUE), ]
 }

@@ -4,9 +4,12 @@
 #' @param level character HPD level to use in column names (e.g. "0.80")
 #' @param lon name of longitude column prefix (default: "location1")
 #' @param lat name of latitude column prefix (default: "location2")
-#' @param height column name used for HPD polygon heights (default: "height_median")
+#' @param height column name used for HPD polygon ages (default: "height_median")
 #' @param debug logical debug messages
-#' @param most_recent_sample Date or numeric year (e.g. 2019) used to calibrate endheight to actual dates. If NULL (default) no calibration is performed.
+#' @param most_recent_sample Date or numeric year (e.g. 2019) used to calibrate
+#'   ages to actual dates. If NULL (default) no calibration is performed.
+#' @return A data.frame with columns: node, polygon, lon, lat, ageParent, age,
+#'   group; or NULL if no valid HPD polygons found.
 #' @export
 build_hpd <- function(
   treedata,
@@ -53,10 +56,10 @@ build_hpd <- function(
   n_poly <- min(length(loncols), length(latcols))
 
   # Get height for each node
-  endheights <- get_node_vals(treedata, height)
+  node_ages <- get_node_vals(treedata, height)
 
   if (!is.null(most_recent_sample)) {
-    endheights <- calibrate_endheight(endheights, most_recent_sample, debug = debug)
+    node_ages <- calibrate_age(node_ages, most_recent_sample, debug = debug)
   }
 
   # Pre-allocate list for better performance
@@ -70,8 +73,8 @@ build_hpd <- function(
     # Skip if invalid row or height
     if (is.na(row_idx)) next
 
-    h_val <- endheights[i]
-    if (is.na(h_val)) next
+    age_val <- node_ages[i]
+    if (is.na(age_val)) next
 
     # Process each polygon for this node
     for (j in seq_len(n_poly)) {
@@ -101,7 +104,7 @@ build_hpd <- function(
         polygon = rep(j, n_pts),
         lon = as.numeric(lons_vec),
         lat = as.numeric(lats_vec),
-        endheight = rep(h_val, n_pts),
+        age = rep(age_val, n_pts),
         group = rep(paste(i, j, sep = "-"), n_pts),
         stringsAsFactors = FALSE,
         row.names = NULL
@@ -125,6 +128,6 @@ build_hpd <- function(
                     nrow(polys), length(unique(polys$group))))
   }
 
-  # Order by height for consistent layering (oldest/highest first)
-  polys[order(polys$endheight, decreasing = TRUE), , drop = FALSE]
+  # Order by age for consistent layering (oldest/highest first)
+  polys[order(polys$age, decreasing = TRUE), , drop = FALSE]
 }

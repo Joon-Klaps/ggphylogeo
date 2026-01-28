@@ -16,7 +16,7 @@ test_that("build_branches returns expected columns", {
 
   # Check required columns exist
   expected_cols <- c("startnode", "endnode", "lon", "lat", "lonend", "latend",
-                     "startheight", "endheight", "istip", "label")
+                     "ageParent", "age", "istip", "label")
   expect_true(all(expected_cols %in% names(branches)))
 
   # Check data types
@@ -70,7 +70,7 @@ test_that("build_branches respects digits parameter", {
   expect_true(all(!is.na(branches_4$lon)))
 })
 
-test_that("build_branches calibrates heights when most_recent_sample provided", {
+test_that("build_branches calibrates ages when most_recent_sample provided", {
   skip_if_not_installed("treeio")
 
   tree_file <- system.file("extdata", "WNV_cauchy.MCC.tree", package = "ggphylogeo")
@@ -80,11 +80,11 @@ test_that("build_branches calibrates heights when most_recent_sample provided", 
   branches_date <- build_branches(td, lon = "location2", lat = "location1",
                                    most_recent_sample = "2019-01-01")
 
-  expect_false(inherits(branches_numeric$endheight, "Date"))
-  expect_true(inherits(branches_date$endheight, "Date"))
+  expect_false(inherits(branches_numeric$age, "Date"))
+  expect_true(inherits(branches_date$age, "Date"))
 })
 
-test_that("build_branches orders by endheight descending", {
+test_that("build_branches orders by age descending", {
   skip_if_not_installed("treeio")
 
   tree_file <- system.file("extdata", "WNV_cauchy.MCC.tree", package = "ggphylogeo")
@@ -92,7 +92,7 @@ test_that("build_branches orders by endheight descending", {
 
   branches <- build_branches(td, lon = "location2", lat = "location1")
 
-  # Numeric heights should be in descending order
-  heights <- as.numeric(branches$endheight)
-  expect_true(all(diff(heights) <= 0) || all(is.na(heights)))
+  # Numeric ages should be in descending order
+  ages <- as.numeric(branches$age)
+  expect_true(all(diff(ages) <= 0) || all(is.na(ages)))
 })

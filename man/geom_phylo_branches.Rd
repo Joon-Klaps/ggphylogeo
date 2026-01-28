@@ -11,6 +11,8 @@ geom_phylo_branches(mapping = NULL, data = NULL, stream = FALSE, ...)
 
 \item{data}{A data frame or \code{phylo_phylogeo} object containing branches.}
 
+\item{stream}{logical; use stream plotting (default FALSE)}
+
 \item{...}{Other arguments passed on to ggplot2::geom_curve.}
 }
 \description{

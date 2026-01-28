@@ -51,21 +51,21 @@ get_data_bbox <- function(segs, hpd, pad = 1) {
   list(xlim = lonlim, ylim = latlim)
 }
 
-#' Add direction legend annotation
+#' Add dispersion legend annotation
 #'
-#' Builds a mini-legend showing the direction convention for curved branches.
+#' Builds a mini-legend showing the dispersion convention for curved branches.
 #' The legend displays two curved arrows demonstrating left-to-right and
-#' right-to-left directions.
+#' right-to-left dispersions.
 #'
-#' @param bbox list with xlim and ylim from [get_data_bbox()]
+#' @param bbox list with xlim and ylim from `get_data_bbox()`
 #' @param curvature curvature value used in the main plot
 #' @return A list of ggplot2 annotation layers that can be added to a ggplot object
 #' @examples
 #' bbox <- list(xlim = c(-10, 10), ylim = c(-5, 5))
 #' p <- ggplot2::ggplot() + ggplot2::xlim(bbox$xlim) + ggplot2::ylim(bbox$ylim)
-#' p + add_direction_legend(bbox)
+#' p + add_dispersion_legend(bbox)
 #' @export
-add_direction_legend <- function(bbox, curvature = 0.3) {
+add_dispersion_legend <- function(bbox, curvature = -0.3, text_size = 2.5) {
   # Position legend in top-left corner
   x_range <- diff(bbox$xlim)
   y_range <- diff(bbox$ylim)
@@ -79,10 +79,10 @@ add_direction_legend <- function(bbox, curvature = 0.3) {
   # Create legend data
   legend_df <- data.frame(
     x = c(legend_x - legend_width/2, legend_x + legend_width/2),
-    y = c(legend_y - legend_height/4, legend_y - legend_height/8),
+    y = c(legend_y - legend_height/8, legend_y - legend_height/4),
     xend = c(legend_x + legend_width/2, legend_x - legend_width/2),
-    yend = c(legend_y - legend_height/4, legend_y - legend_height/8),
-    direction = c("Earlier \u2192 Later", "Later \u2192 Earlier")
+    yend = c(legend_y - legend_height/8, legend_y - legend_height/4),
+    dispersion = c("Earlier \u2192 Later", "Later \u2192 Earlier")
   )
 
   # Return annotation layers
@@ -103,7 +103,7 @@ add_direction_legend <- function(bbox, curvature = 0.3) {
       data = legend_df[1, ],
       ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
       curvature = curvature,
-      arrow = grid::arrow(length = grid::unit(0.08, "inches"), type = "closed"),
+      arrow = grid::arrow(length = grid::unit(0.08, "inches"), type = "closed", ends = "first"),
       colour = "gray30",
       linewidth = 0.5,
       inherit.aes = FALSE
@@ -113,7 +113,7 @@ add_direction_legend <- function(bbox, curvature = 0.3) {
       data = legend_df[2, ],
       ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
       curvature = curvature,
-      arrow = grid::arrow(length = grid::unit(0.08, "inches"), type = "closed"),
+      arrow = grid::arrow(length = grid::unit(0.08, "inches"), type = "closed", ends = "first"),
       colour = "gray30",
       linewidth = 0.5,
       inherit.aes = FALSE
@@ -123,8 +123,8 @@ add_direction_legend <- function(bbox, curvature = 0.3) {
       "text",
       x = legend_x,
       y = legend_y + legend_height * 0.6,
-      label = "Direction",
-      size = 2.5,
+      label = "Dispersion",
+      size = text_size,
       fontface = "bold"
     )
   )
@@ -142,7 +142,7 @@ match_nodes <- function(phy, data) {
   key
 }
 
-#' Calibrate numeric endheights (e.g. years before most recent sample) to Date
+#' Calibrate numeric ages (e.g. years before most recent sample) to Date
 #'
 #' If `most_recent_sample` is NULL this returns `endh` unchanged. If provided,
 #' it must be a Date, POSIXt, or numeric year (e.g. 2019). Numeric endh values
@@ -155,7 +155,7 @@ match_nodes <- function(phy, data) {
 #' @return Date vector when `most_recent_sample` provided, otherwise returns `endh` as-is
 #' @keywords internal
 #' @noRd
-calibrate_endheight <- function(endh, most_recent_sample = NULL, debug = FALSE) {
+calibrate_age <- function(endh, most_recent_sample = NULL, debug = FALSE) {
   if (is.null(most_recent_sample)) return(endh)
 
   # Accept character dates in ISO format
@@ -180,7 +180,7 @@ calibrate_endheight <- function(endh, most_recent_sample = NULL, debug = FALSE) 
   non_na <- !is.na(endh_vec)
   out_dates[non_na] <- mrs_date - round(as.numeric(endh_vec[non_na]) * 365.25)
 
-  if (debug) message(sprintf("calibrate_endheight: converted %d/%d values to Date", sum(non_na), length(endh_vec)))
+  if (debug) message(sprintf("calibrate_age: converted %d/%d values to Date", sum(non_na), length(endh_vec)))
 
   out_dates
 }
@@ -219,7 +219,10 @@ theme_phylogeo <- function() {
       legend.justification = c("left", "bottom"),
       legend.margin = ggplot2::margin(6, 6, 6, 6),
       legend.background = ggplot2::element_rect(fill = "transparent", colour = NA),
-      legend.box.background = ggplot2::element_rect(fill = "transparent", colour = NA)
+      legend.box.background = ggplot2::element_rect(fill = "transparent", colour = NA),
+      panel.background = ggplot2::element_rect(fill = "lightblue1"),
+      panel.grid.major = ggplot2::element_blank(),
+      panel.grid.minor = ggplot2::element_blank(),
     )
 }
 

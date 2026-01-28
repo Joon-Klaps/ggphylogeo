@@ -23,11 +23,16 @@ build_hpd(
 
 \item{lat}{name of latitude column prefix (default: "location2")}
 
-\item{height}{column name used for HPD polygon heights (default: "height_median")}
+\item{height}{column name used for HPD polygon ages (default: "height_median")}
 
-\item{most_recent_sample}{Date or numeric year (e.g. 2019) used to calibrate endheight to actual dates. If NULL (default) no calibration is performed.}
+\item{most_recent_sample}{Date or numeric year (e.g. 2019) used to calibrate
+ages to actual dates. If NULL (default) no calibration is performed.}
 
 \item{debug}{logical debug messages}
+}
+\value{
+A data.frame with columns: node, polygon, lon, lat, ageParent, age,
+group; or NULL if no valid HPD polygons found.
 }
 \description{
 Build HPD polygons for continuous phylogeography

@@ -14,6 +14,6 @@ geom_phylo_nodes(mapping = NULL, data = NULL, ...)
 \item{...}{Other arguments passed on to ggplot2::geom_point.}
 }
 \description{
-Plot all tree nodes as points filled by their endheight value (same color
+Plot all tree nodes as points filled by their age value (same color
 scale as HPD polygons).
 }

@@ -16,7 +16,7 @@ test_that("build_nodes returns expected columns", {
   nodes <- build_nodes(td, lon = "location2", lat = "location1")
 
   # Check required columns exist
-  expected_cols <- c("node", "lon", "lat", "endheight", "istip", "label")
+  expected_cols <- c("node", "lon", "lat", "age", "istip", "label")
   expect_true(all(expected_cols %in% names(nodes)))
 
   # Check data types
@@ -73,7 +73,7 @@ test_that("build_nodes respects digits parameter", {
   expect_true(all(!is.na(nodes_4$lon)))
 })
 
-test_that("build_nodes calibrates heights when most_recent_sample provided", {
+test_that("build_nodes calibrates ages when most_recent_sample provided", {
   skip_if_not_installed("treeio")
 
   tree_file <- system.file("extdata", "WNV_cauchy.MCC.tree", package = "ggphylogeo")
@@ -83,6 +83,6 @@ test_that("build_nodes calibrates heights when most_recent_sample provided", {
   nodes_date <- build_nodes(td, lon = "location2", lat = "location1",
                              most_recent_sample = "2019-01-01")
 
-  expect_false(inherits(nodes_numeric$endheight, "Date"))
-  expect_true(inherits(nodes_date$endheight, "Date"))
+  expect_false(inherits(nodes_numeric$age, "Date"))
+  expect_true(inherits(nodes_date$age, "Date"))
 })

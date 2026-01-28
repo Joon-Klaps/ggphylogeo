@@ -21,17 +21,17 @@ build_nodes(
 
 \item{lat}{name of latitude column prefix (default: "location2")}
 
-\item{height}{column name used for node heights (default: "height_median")}
+\item{height}{column name used for node ages (default: "height_median")}
 
 \item{digits}{numeric digits for rounding coordinates (default: 2)}
 
 \item{most_recent_sample}{Date or numeric year (e.g. 2019) used to calibrate
-endheight to actual dates. If NULL (default) no calibration is performed.}
+ages to actual dates. If NULL (default) no calibration is performed.}
 
 \item{debug}{logical debug messages}
 }
 \value{
-A data.frame with columns: node, lon, lat, endheight, istip, label
+A data.frame with columns: node, lon, lat, age, istip, label
 }
 \description{
 Build node table for continuous phylogeography

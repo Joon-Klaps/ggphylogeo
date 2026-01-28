@@ -15,7 +15,7 @@ test_that("build_hpd returns expected columns when HPD data exists", {
   hpd <- build_hpd(td, level = "0.80", lon = "location2", lat = "location1")
 
   if (!is.null(hpd)) {
-    expected_cols <- c("node", "polygon", "lon", "lat", "endheight", "group")
+    expected_cols <- c("node", "polygon", "lon", "lat", "age", "group")
     expect_true(all(expected_cols %in% names(hpd)))
 
     # Check data types
@@ -50,7 +50,7 @@ test_that("build_hpd respects level parameter", {
   expect_true(is.null(hpd_80) || is.data.frame(hpd_80))
 })
 
-test_that("build_hpd calibrates heights when most_recent_sample provided", {
+test_that("build_hpd calibrates ages when most_recent_sample provided", {
   skip_if_not_installed("treeio")
 
   tree_file <- system.file("extdata", "WNV_cauchy.MCC.tree", package = "ggphylogeo")
@@ -61,8 +61,8 @@ test_that("build_hpd calibrates heights when most_recent_sample provided", {
                          most_recent_sample = "2019-01-01")
 
   if (!is.null(hpd_numeric) && !is.null(hpd_date)) {
-    expect_false(inherits(hpd_numeric$endheight, "Date"))
-    expect_true(inherits(hpd_date$endheight, "Date"))
+    expect_false(inherits(hpd_numeric$age, "Date"))
+    expect_true(inherits(hpd_date$age, "Date"))
   }
 })
 

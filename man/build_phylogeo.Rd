@@ -6,8 +6,8 @@
 \usage{
 build_phylogeo(
   treedata,
-  lon = "location1",
-  lat = "location2",
+  lat = "location1",
+  lon = "location2",
   height_branches = "height_mean",
   height_hpd = "height_median",
   level = "0.80",
@@ -19,19 +19,19 @@ build_phylogeo(
 \arguments{
 \item{treedata}{treedata object with phylogeographic annotations}
 
-\item{lon}{name of longitude column (default: "location1")}
-
 \item{lat}{name of latitude column (default: "location2")}
 
-\item{height_branches}{column name for branch heights (default: "height_mean")}
+\item{lon}{name of longitude column (default: "location1")}
 
-\item{height_hpd}{column name for HPD heights (default: "height_median")}
+\item{height_branches}{column name for branch ages (default: "height_mean")}
+
+\item{height_hpd}{column name for HPD ages (default: "height_median")}
 
 \item{level}{HPD level (default: "0.80")}
 
 \item{digits}{numeric digits for rounding coordinates (default: 2)}
 
-\item{most_recent_sample}{Date or numeric year (e.g. 2019) used to calibrate endheight to actual dates. If NULL (default) no calibration is performed.}
+\item{most_recent_sample}{Date or numeric year (e.g. 2019) used to calibrate age to actual dates. If NULL (default) no calibration is performed.}
 
 \item{debug}{logical debug messages}
 }

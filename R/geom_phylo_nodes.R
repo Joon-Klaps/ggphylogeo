@@ -1,6 +1,6 @@
 #' Phylogeographic nodes
 #'
-#' Plot all tree nodes as points filled by their endheight value (same color
+#' Plot all tree nodes as points filled by their age value (same color
 #' scale as HPD polygons).
 #'
 #' @param mapping Aesthetic mappings, created with ggplot2::aes().
@@ -14,7 +14,7 @@ geom_phylo_nodes <- function(mapping = NULL, data = NULL, ...) {
   }
 
   ggplot2::geom_point(
-    mapping = mapping %||% ggplot2::aes(x = lon, y = lat, fill = endheight),
+    mapping = mapping %||% ggplot2::aes(x = lon, y = lat, fill = age),
     data = data,
     shape = 21,
     ...

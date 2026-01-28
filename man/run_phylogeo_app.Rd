@@ -27,9 +27,11 @@ treeio::read.beast()}
 \item{most_recent_sample}{Date, numeric year, or "YYYY-MM-DD" string for
 calibrating dates}
 
-\item{height_branches}{column for branch heights (default: "height_mean")}
+\item{stream}{logical; whether to use stream plotting style (default TRUE)}
 
-\item{height_hpd}{column for HPD heights (default: "height_median")}
+\item{height_branches}{column for branch ages (default: "height_mean")}
+
+\item{height_hpd}{column for HPD ages (default: "height_median")}
 
 \item{level}{HPD level (default: "0.80")}
 

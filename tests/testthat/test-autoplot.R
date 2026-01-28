@@ -73,7 +73,7 @@ test_that("autoplot.treedata respects highlight_tips parameter", {
   expect_s3_class(p, "ggplot")
 })
 
-test_that("autoplot.treedata respects show_direction_legend parameter", {
+test_that("autoplot.treedata respects show_dispersion_legend parameter", {
   skip_if_not_installed("treeio")
   skip_if_not_installed("ggplot2")
 
@@ -81,9 +81,9 @@ test_that("autoplot.treedata respects show_direction_legend parameter", {
   td <- treeio::read.beast(tree_file)
 
   p_no_legend <- ggplot2::autoplot(td, lon = "location2", lat = "location1",
-                                    show_direction_legend = FALSE, show_map = FALSE)
+                                    show_dispersion_legend = FALSE, show_map = FALSE)
   p_with_legend <- ggplot2::autoplot(td, lon = "location2", lat = "location1",
-                                      show_direction_legend = TRUE, show_map = FALSE)
+                                      show_dispersion_legend = TRUE, show_map = FALSE)
 
   # Legend version should have more layers
   expect_gt(length(p_with_legend$layers), length(p_no_legend$layers))
