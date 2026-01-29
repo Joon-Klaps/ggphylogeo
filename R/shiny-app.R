@@ -182,8 +182,6 @@ run_phylogeo_app <- function(
         if (input$show_branches) {
           p0 <- p0 + geom_phylo_branches(
               data = active_branches,
-              curvature = 0.2,
-              ncp = 50,
               linewidth = 0.8
           )
         }
