@@ -34,6 +34,8 @@ library(ggphylogeo)
 
 # Load bundled example data
 data(yfv_tree)
+# OR
+# yfv_tree <- treeio::read.beast("YFV.MCC.tree")
 
 # Basic plot with date calibration
 autoplot(yfv_tree, most_recent_sample = "2017-04-22")
