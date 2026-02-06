@@ -4,6 +4,7 @@
 
 [![R-CMD-check](https://github.com/Joon-Klaps/ggphylogeo/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Joon-Klaps/ggphylogeo/actions/workflows/R-CMD-check.yaml)
 [![codecov](https://codecov.io/gh/Joon-Klaps/ggphylogeo/branch/master/graph/badge.svg)](https://codecov.io/gh/Joon-Klaps/ggphylogeo)
+[![DOI](https://zenodo.org/badge/1142301313.svg)](https://doi.org/10.5281/zenodo.18507141)
 
 <!-- badges: end -->
 
