@@ -150,7 +150,7 @@ test_that("stream branches work with real data", {
 # SHINY APP TESTS
 # ============================================================================
 
-test_that("run_phylogeo_app creates a shiny app object", {
+test_that("phylogeo_app creates a shiny app object", {
   skip_if_not_installed("treeio")
   skip_if_not_installed("shiny")
   skip_if_not_installed("plotly")
@@ -158,14 +158,14 @@ test_that("run_phylogeo_app creates a shiny app object", {
   datasets <- get_test_datasets()
   td <- treeio::read.beast(datasets$wnv)
 
-  # run_phylogeo_app should return a shiny.appobj without running it
-  app <- run_phylogeo_app(td, lon = "location2", lat = "location1",
+  # phylogeo_app should return a shiny.appobj without running it
+  app <- phylogeo_app(td, lon = "location2", lat = "location1",
                           most_recent_sample = "2007-07-01")
 
   expect_s3_class(app, "shiny.appobj")
 })
 
-test_that("run_phylogeo_app works with all datasets", {
+test_that("phylogeo_app works with all datasets", {
   skip_if_not_installed("treeio")
   skip_if_not_installed("shiny")
   skip_if_not_installed("plotly")
@@ -174,17 +174,17 @@ test_that("run_phylogeo_app works with all datasets", {
 
   # WNV
   td <- treeio::read.beast(datasets$wnv)
-  app <- run_phylogeo_app(td, lon = "location2", lat = "location1")
+  app <- phylogeo_app(td, lon = "location2", lat = "location1")
   expect_s3_class(app, "shiny.appobj")
 
   # YFV
   td <- treeio::read.beast(datasets$yfv)
-  app <- run_phylogeo_app(td, lon = "location2", lat = "location1")
+  app <- phylogeo_app(td, lon = "location2", lat = "location1")
   expect_s3_class(app, "shiny.appobj")
 
   # H3N2
   td <- treeio::read.beast(datasets$h3n2)
-  app <- run_phylogeo_app(td, lon = "antigenic1", lat = "antigenic2")
+  app <- phylogeo_app(td, lon = "antigenic1", lat = "antigenic2")
   expect_s3_class(app, "shiny.appobj")
 })
 

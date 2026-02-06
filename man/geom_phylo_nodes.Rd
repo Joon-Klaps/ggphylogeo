@@ -4,12 +4,14 @@
 \alias{geom_phylo_nodes}
 \title{Phylogeographic nodes}
 \usage{
-geom_phylo_nodes(mapping = NULL, data = NULL, ...)
+geom_phylo_nodes(mapping = NULL, data = NULL, shape = 21, ...)
 }
 \arguments{
 \item{mapping}{Aesthetic mappings, created with ggplot2::aes().}
 
 \item{data}{A data frame or \code{phylo_phylogeo} object containing nodes.}
+
+\item{shape}{Point shape (default: 21).}
 
 \item{...}{Other arguments passed on to ggplot2::geom_point.}
 }

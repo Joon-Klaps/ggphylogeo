@@ -22,9 +22,9 @@
 #' \dontrun{
 #' library(treeio)
 #' tree <- read.beast("path/to/beast.tree")
-#' run_phylogeo_app(tree, most_recent_sample = "2019-06-15")
+#' phylogeo_app(tree, most_recent_sample = "2019-06-15")
 #' }
-run_phylogeo_app <- function(
+phylogeo_app <- function(
   treedata,
   lon = "location2",
   lat = "location1",

@@ -1,7 +1,7 @@
 Package: ggphylogeo
 Type: Package
 Title: ggplot2 Tools for Continuous Phylogeography
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: person("Joon", "Klaps", email = "joon.klaps@example.com", role = c("aut", "cre"))
 Description: Visualization tools for BEAST continuous phylogeographic
     analyses using ggplot2. Provides functions to build and plot branch

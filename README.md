@@ -263,7 +263,7 @@ library(ggphylogeo)
 data(wnv_tree)
 
 # Launch interactive viewer
-run_phylogeo_app(wnv_tree, most_recent_sample = "2007-07-01")
+phylogeo_app(wnv_tree, most_recent_sample = "2007-07-01")
 ```
 
 ![Shiny screenshot](inst/extras/wnv_shiny.png)

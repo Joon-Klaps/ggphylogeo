@@ -263,7 +263,7 @@ autoplot.treedata <- function(
       p <- p + ggplot2::geom_point(
         data = internal_data,
         ggplot2::aes(x = lon, y = lat, fill = age),
-        shape = 21,
+        shape = 22,
         size = node_size,
         stroke = tip_stroke/2,
         inherit.aes = FALSE

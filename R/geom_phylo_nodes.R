@@ -5,6 +5,7 @@
 #'
 #' @param mapping Aesthetic mappings, created with ggplot2::aes().
 #' @param data A data frame or `phylo_phylogeo` object containing nodes.
+#' @param shape Point shape (default: 21).
 #' @param ... Other arguments passed on to ggplot2::geom_point.
 #' @export
 geom_phylo_nodes <- function(mapping = NULL, data = NULL, shape = 21, ...) {
