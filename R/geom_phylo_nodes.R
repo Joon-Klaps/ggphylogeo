@@ -7,7 +7,7 @@
 #' @param data A data frame or `phylo_phylogeo` object containing nodes.
 #' @param ... Other arguments passed on to ggplot2::geom_point.
 #' @export
-geom_phylo_nodes <- function(mapping = NULL, data = NULL, ...) {
+geom_phylo_nodes <- function(mapping = NULL, data = NULL, shape = 21, ...) {
   # Accept combined `phylo_phylogeo` objects and extract the nodes component
   if (!is.null(data) && inherits(data, "phylo_phylogeo")) {
     data <- data$nodes
@@ -16,7 +16,7 @@ geom_phylo_nodes <- function(mapping = NULL, data = NULL, ...) {
   ggplot2::geom_point(
     mapping = mapping %||% ggplot2::aes(x = lon, y = lat, fill = age),
     data = data,
-    shape = 21,
+    shape = shape,
     ...
   )
 }
